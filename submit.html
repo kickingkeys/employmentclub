@@ -548,45 +548,51 @@
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner"></span>Uploading...';
 
-            // Upload image
-            const ext = projectFile.name.split('.').pop();
-            const path = `${currentUser.id}/${Date.now()}.${ext}`;
-            const { error: uploadError } = await sb.storage
-                .from('project-images')
-                .upload(path, projectFile);
+            try {
+                // Upload image
+                const ext = projectFile.name.split('.').pop();
+                const path = `${currentUser.id}/${Date.now()}.${ext}`;
+                const { error: uploadError } = await sb.storage
+                    .from('project-images')
+                    .upload(path, projectFile);
 
-            if (uploadError) {
-                setStatus('Upload failed: ' + uploadError.message, 'error');
+                if (uploadError) {
+                    setStatus('Upload failed: ' + uploadError.message, 'error');
+                    btn.disabled = false;
+                    btn.textContent = 'Submit project';
+                    return;
+                }
+
+                const { data: urlData } = sb.storage
+                    .from('project-images')
+                    .getPublicUrl(path);
+
+                // Get canvas position
+                const pos = await getCanvasPosition();
+
+                // Insert project
+                const { error } = await sb.from('projects').insert({
+                    member_id: currentUser.id,
+                    title,
+                    description: desc,
+                    project_url: projectUrl,
+                    image_url: urlData.publicUrl,
+                    ...pos,
+                    width: 250
+                });
+
+                if (error) {
+                    setStatus('Submission failed: ' + error.message, 'error');
+                    btn.disabled = false;
+                    btn.textContent = 'Submit project';
+                } else {
+                    clearStatus();
+                    showSection('success');
+                }
+            } catch (e) {
+                setStatus('Error: ' + e.message, 'error');
                 btn.disabled = false;
                 btn.textContent = 'Submit project';
-                return;
-            }
-
-            const { data: urlData } = sb.storage
-                .from('project-images')
-                .getPublicUrl(path);
-
-            // Get canvas position
-            const pos = await getCanvasPosition();
-
-            // Insert project
-            const { error } = await sb.from('projects').insert({
-                member_id: currentUser.id,
-                title,
-                description: desc,
-                project_url: projectUrl,
-                image_url: urlData.publicUrl,
-                ...pos,
-                width: 250
-            });
-
-            if (error) {
-                setStatus('Submission failed: ' + error.message, 'error');
-                btn.disabled = false;
-                btn.textContent = 'Submit project';
-            } else {
-                clearStatus();
-                showSection('success');
             }
         }
 
