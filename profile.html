@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile — Employment Club</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f5f0eb;
+            --text: #1a1a1a;
+            --muted: #8a8178;
+            --border: rgba(0,0,0,0.08);
+            --sans: 'Inter', system-ui, -apple-system, sans-serif;
+            --serif: 'Lora', Georgia, serif;
+            --hand: 'Caveat', cursive;
+            --ease: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--sans);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 3rem 1.5rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 520px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .logo { width: 120px; margin-bottom: 1.5rem; filter: drop-shadow(0 8px 16px rgba(0,0,0,0.06)); }
+
+        /* Profile header */
+        .profile-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 2.5rem;
+            opacity: 0;
+            animation: fadeUp 0.6s var(--ease) forwards;
+        }
+
+        .profile-avatar {
+            width: 80px; height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #e0d5c9, #c4b8ab);
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--hand);
+            font-size: 2rem; font-weight: 600;
+            color: rgba(0,0,0,0.25);
+            overflow: hidden;
+            border: 3px solid rgba(255,255,255,0.8);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            margin-bottom: 1rem;
+        }
+        .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+        .profile-name {
+            font-family: var(--serif);
+            font-size: 1.6rem; font-weight: 400; font-style: italic;
+            margin-bottom: 0.3rem;
+        }
+
+        .profile-email {
+            font-size: 0.75rem; color: var(--muted);
+            margin-bottom: 0.3rem;
+        }
+
+        .profile-website {
+            font-size: 0.72rem; color: var(--muted);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .profile-website:hover { color: var(--text); }
+
+        /* Section labels */
+        .section-label {
+            font-size: 0.6rem; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 1.5px;
+            color: rgba(0,0,0,0.25); margin-bottom: 1rem;
+            width: 100%;
+        }
+
+        /* Projects list */
+        .projects-section {
+            width: 100%;
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: fadeUp 0.6s 0.1s var(--ease) forwards;
+        }
+
+        .project-card {
+            display: flex; gap: 14px;
+            padding: 14px;
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            margin-bottom: 0.75rem;
+            transition: all 0.25s var(--ease);
+        }
+        .project-card:hover {
+            background: rgba(255,255,255,0.8);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+        }
+
+        .project-thumb {
+            width: 72px; height: 72px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #e0d5c9, #c4b8ab);
+            flex-shrink: 0;
+        }
+
+        .project-info {
+            display: flex; flex-direction: column;
+            justify-content: center;
+            min-width: 0;
+        }
+
+        .project-title {
+            font-family: var(--hand);
+            font-size: 1.1rem; font-weight: 600;
+            color: rgba(0,0,0,0.55);
+            line-height: 1.2;
+            margin-bottom: 2px;
+        }
+
+        .project-desc {
+            font-size: 0.7rem; color: var(--muted);
+            line-height: 1.4;
+            margin-bottom: 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .project-link {
+            display: inline-flex; align-items: center; gap: 3px;
+            font-size: 0.6rem; font-weight: 600;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            color: rgba(0,0,0,0.2);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .project-link:hover { color: rgba(0,0,0,0.5); }
+        .project-link svg { width: 9px; height: 9px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+
+        .project-date {
+            font-size: 0.6rem; color: rgba(0,0,0,0.25);
+            margin-top: 2px;
+        }
+
+        .project-actions {
+            display: flex; gap: 6px;
+            margin-top: 6px;
+        }
+
+        .project-action-btn {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 4px 10px;
+            font-family: var(--sans);
+            font-size: 0.6rem; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: transparent;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .project-action-btn:hover { background: rgba(255,255,255,0.8); color: var(--text); }
+        .project-action-btn svg { width: 10px; height: 10px; stroke: currentColor; fill: none; stroke-width: 2; }
+        .project-action-btn.delete-btn { color: #c0365e; border-color: rgba(192,54,94,0.15); }
+        .project-action-btn.delete-btn:hover { background: rgba(192,54,94,0.05); }
+
+        .project-card-link {
+            cursor: pointer;
+        }
+
+        .no-projects {
+            font-size: 0.82rem; color: var(--muted);
+            text-align: center;
+            padding: 2rem 0;
+            font-style: italic;
+        }
+
+        /* Edit modal */
+        .edit-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(4px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.2s ease;
+        }
+        .edit-modal {
+            background: var(--bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            width: 90%; max-width: 420px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+        .edit-header {
+            font-family: var(--serif);
+            font-size: 1.2rem; font-style: italic;
+            margin-bottom: 1.2rem;
+        }
+        .edit-field { margin-bottom: 1rem; }
+        .edit-field label {
+            display: block;
+            font-size: 0.6rem; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 1px;
+            color: rgba(0,0,0,0.3);
+            margin-bottom: 0.4rem;
+        }
+        .edit-field input, .edit-field textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-family: var(--sans);
+            font-size: 0.85rem;
+            background: rgba(255,255,255,0.5);
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+        .edit-field input:focus, .edit-field textarea:focus { border-color: rgba(0,0,0,0.2); }
+        .edit-image-row { display: flex; align-items: center; gap: 12px; }
+        .edit-thumb {
+            width: 56px; height: 56px;
+            border-radius: 8px; object-fit: cover;
+            background: linear-gradient(135deg, #e0d5c9, #c4b8ab);
+        }
+        .edit-change-btn {
+            font-size: 0.7rem; font-weight: 600;
+            color: var(--muted); cursor: pointer;
+            text-decoration: underline;
+        }
+        .edit-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1.2rem; }
+        .edit-cancel, .edit-save {
+            padding: 8px 20px;
+            border-radius: 10px;
+            font-family: var(--sans);
+            font-size: 0.8rem; font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+        .edit-cancel { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+        .edit-cancel:hover { background: rgba(255,255,255,0.5); }
+        .edit-save { background: var(--text); color: var(--bg); }
+        .edit-save:hover { opacity: 0.85; }
+        .edit-save:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        .btn-edit-profile {
+            font-family: var(--sans);
+            font-size: 0.7rem; font-weight: 600;
+            color: var(--muted);
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 6px 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-edit-profile:hover { background: rgba(255,255,255,0.5); color: var(--text); }
+
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-family: var(--sans);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s var(--ease);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--muted);
+            border: 1px solid var(--border);
+        }
+        .btn-ghost:hover { background: rgba(255,255,255,0.5); }
+
+        .btn-danger {
+            background: transparent;
+            color: #c0365e;
+            border: 1px solid rgba(192,54,94,0.15);
+        }
+        .btn-danger:hover { background: rgba(192,54,94,0.05); }
+
+        .actions {
+            width: 100%;
+            display: flex; flex-direction: column; gap: 0.5rem;
+            opacity: 0;
+            animation: fadeUp 0.6s 0.2s var(--ease) forwards;
+        }
+
+        /* Back link */
+        .back-link {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 0.75rem; font-weight: 500;
+            color: var(--muted); text-decoration: none;
+            margin-top: 2rem;
+            transition: color 0.2s ease;
+        }
+        .back-link:hover { color: var(--text); }
+        .back-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+        @keyframes fadeUp {
+            0% { opacity: 0; transform: translateY(12px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html"><img src="logo.png" alt="Employment Club" class="logo"></a>
+
+        <div id="profile-content"></div>
+
+        <a href="index.html" class="back-link">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            Back to canvas
+        </a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://pqzyhiyohiruvkjtqsii.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable__I5kMfVhw4D-LIfJiAdZMg_MZdj-ixV';
+        const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        function esc(str) {
+            const d = document.createElement('div');
+            d.textContent = str;
+            return d.innerHTML;
+        }
+
+        function safeUrl(url) {
+            if (!url) return '';
+            const u = url.trim();
+            if (u.startsWith('http://') || u.startsWith('https://')) return u;
+            if (u.startsWith('javascript:') || u.startsWith('data:')) return '';
+            return 'https://' + u;
+        }
+
+        function getAvatarUrl(user, profile) {
+            if (profile?.avatar_url) return profile.avatar_url;
+            return null;
+        }
+
+        async function init() {
+            const { data: { session } } = await sb.auth.getSession();
+            if (!session) {
+                window.location.href = 'submit.html';
+                return;
+            }
+
+            const user = session.user;
+
+            // Load profile from members table
+            const { data: profile } = await sb
+                .from('members')
+                .select('*')
+                .eq('id', user.id)
+                .single();
+
+            // Load user's projects
+            const { data: projects } = await sb
+                .from('projects')
+                .select('*')
+                .eq('member_id', user.id)
+                .order('created_at', { ascending: false });
+
+            render(user, profile, projects || []);
+        }
+
+        let currentUserId = null;
+        let editImageFile = null;
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const d = new Date(dateStr);
+            return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        function render(user, profile, projects) {
+            currentUserId = user.id;
+            const content = document.getElementById('profile-content');
+            const name = esc(profile?.name || 'Member');
+            const email = esc(user.email || '');
+            const avatarUrl = getAvatarUrl(user, profile);
+            const website = profile?.website ? safeUrl(profile.website) : null;
+            const initial = (profile?.name || 'M').charAt(0).toUpperCase();
+
+            const avatarInner = avatarUrl
+                ? `<img src="${esc(avatarUrl)}" alt="${name}" referrerpolicy="no-referrer">`
+                : initial;
+
+            const websiteHtml = website
+                ? `<a class="profile-website" href="${website}" target="_blank" rel="noopener noreferrer">${esc(profile.website)}</a>`
+                : '';
+
+            let projectsHtml = '';
+            if (projects.length === 0) {
+                projectsHtml = '<div class="no-projects">No projects yet &mdash; add one on the canvas!</div>';
+            } else {
+                projectsHtml = projects.map(p => {
+                    const linkHtml = p.project_url
+                        ? `<a class="project-link" href="${safeUrl(p.project_url)}" target="_blank" rel="noopener noreferrer">View <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></a>`
+                        : '';
+                    return `
+                        <div class="project-card project-card-link" data-project-id="${esc(p.id)}" data-cx="${p.canvas_x || 0}" data-cy="${p.canvas_y || 0}">
+                            <img class="project-thumb" src="${esc(p.image_url || '')}" alt="${esc(p.title || '')}">
+                            <div class="project-info">
+                                <div class="project-title">${esc(p.title || '')}</div>
+                                <div class="project-desc">${esc(p.description || '')}</div>
+                                ${linkHtml}
+                                <div class="project-date">${formatDate(p.created_at)}</div>
+                                <div class="project-actions">
+                                    <button class="project-action-btn edit-btn" data-id="${esc(p.id)}">
+                                        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.85 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+                                        Edit
+                                    </button>
+                                    <button class="project-action-btn delete-btn" data-id="${esc(p.id)}">
+                                        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>`;
+                }).join('');
+            }
+
+            content.innerHTML = `
+                <div class="profile-header">
+                    <div class="profile-avatar">${avatarInner}</div>
+                    <div class="profile-name">${name}</div>
+                    <div class="profile-email">${email}</div>
+                    ${websiteHtml}
+                    <button class="btn-edit-profile" id="edit-profile-btn" style="margin-top:0.8rem;">Edit profile</button>
+                </div>
+
+                <div class="projects-section">
+                    <div class="section-label">Your projects</div>
+                    ${projectsHtml}
+                </div>
+
+                <div class="actions">
+                    <a href="submit.html" class="btn btn-ghost" style="text-align:center; text-decoration:none;">Submit new project</a>
+                    <button class="btn btn-danger" onclick="signOut()">Sign out</button>
+                </div>
+            `;
+
+            // Bind edit buttons
+            content.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = btn.dataset.id;
+                    const proj = projects.find(p => p.id === id);
+                    if (proj) openEditModal(proj);
+                });
+            });
+
+            // Bind delete buttons
+            content.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteProject(btn.dataset.id);
+                });
+            });
+
+            // Bind edit profile button
+            document.getElementById('edit-profile-btn').addEventListener('click', () => {
+                openProfileEditModal(user, profile);
+            });
+
+            // Bind card click → navigate to canvas
+            content.querySelectorAll('.project-card-link').forEach(card => {
+                card.addEventListener('click', (e) => {
+                    // Don't navigate if clicking a link or button
+                    if (e.target.closest('a') || e.target.closest('button')) return;
+                    const cx = card.dataset.cx;
+                    const cy = card.dataset.cy;
+                    window.location.href = `index.html#project-${card.dataset.projectId}&x=${cx}&y=${cy}`;
+                });
+            });
+        }
+
+        function openProfileEditModal(user, profile) {
+            const overlay = document.createElement('div');
+            overlay.className = 'edit-overlay';
+            overlay.id = 'profile-edit-overlay';
+            overlay.addEventListener('click', function(e) { if (e.target === this) this.remove(); });
+
+            const modal = document.createElement('div');
+            modal.className = 'edit-modal';
+            modal.addEventListener('click', function(e) { e.stopPropagation(); });
+            modal.innerHTML = `
+                <div class="edit-header">Edit profile</div>
+                <div class="edit-field">
+                    <label>Name</label>
+                    <input type="text" id="profile-edit-name" maxlength="30">
+                </div>
+                <div class="edit-field">
+                    <label>Website</label>
+                    <input type="text" id="profile-edit-website" placeholder="https://yoursite.com">
+                </div>
+                <div class="edit-actions">
+                    <button class="edit-cancel" id="profile-edit-cancel">Cancel</button>
+                    <button class="edit-save" id="profile-edit-save">Save</button>
+                </div>
+            `;
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+
+            document.getElementById('profile-edit-name').value = profile?.name || '';
+            document.getElementById('profile-edit-website').value = profile?.website || '';
+            document.getElementById('profile-edit-cancel').addEventListener('click', () => overlay.remove());
+            document.getElementById('profile-edit-save').addEventListener('click', async () => {
+                const name = document.getElementById('profile-edit-name').value.trim();
+                if (!name) { alert('Name is required.'); return; }
+                const website = document.getElementById('profile-edit-website').value.trim() || null;
+
+                const saveBtn = document.getElementById('profile-edit-save');
+                saveBtn.disabled = true;
+                saveBtn.textContent = 'Saving...';
+
+                const { error } = await sb
+                    .from('members')
+                    .update({ name, website })
+                    .eq('id', user.id);
+
+                if (error) {
+                    alert('Save failed: ' + error.message);
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = 'Save';
+                    return;
+                }
+
+                overlay.remove();
+                init();
+            });
+
+            document.getElementById('profile-edit-name').focus();
+        }
+
+        function openEditModal(proj) {
+            editImageFile = null;
+
+            const overlay = document.createElement('div');
+            overlay.className = 'edit-overlay';
+            overlay.id = 'edit-overlay';
+            overlay.addEventListener('click', function(e) { if (e.target === this) closeEditModal(); });
+
+            const modal = document.createElement('div');
+            modal.className = 'edit-modal';
+            modal.addEventListener('click', function(e) { e.stopPropagation(); });
+            modal.innerHTML = `
+                <div class="edit-header">Edit project</div>
+                <div class="edit-field">
+                    <label>Title</label>
+                    <input type="text" id="edit-title" maxlength="50">
+                </div>
+                <div class="edit-field">
+                    <label>Description</label>
+                    <textarea id="edit-desc" maxlength="120" rows="2"></textarea>
+                </div>
+                <div class="edit-field">
+                    <label>Project link</label>
+                    <input type="text" id="edit-url" placeholder="https://...">
+                </div>
+                <div class="edit-field">
+                    <label>Image</label>
+                    <div class="edit-image-row">
+                        <img id="edit-image-thumb" class="edit-thumb" src="" alt="">
+                        <label class="edit-change-btn" for="edit-image-file">Change image</label>
+                        <input type="file" id="edit-image-file" accept="image/png,image/jpeg,image/gif" style="display:none">
+                        <span style="font-size:0.6rem;color:rgba(0,0,0,0.25);">PNG, JPG, or GIF (animated OK)</span>
+                    </div>
+                </div>
+                <div class="edit-actions">
+                    <button class="edit-cancel" id="edit-cancel-btn">Cancel</button>
+                    <button class="edit-save" id="edit-save-btn">Save changes</button>
+                </div>
+            `;
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+
+            document.getElementById('edit-title').value = proj.title || '';
+            document.getElementById('edit-desc').value = proj.description || '';
+            document.getElementById('edit-url').value = proj.project_url || '';
+            document.getElementById('edit-image-thumb').src = proj.image_url || '';
+            overlay.dataset.projectId = proj.id;
+
+            document.getElementById('edit-cancel-btn').addEventListener('click', closeEditModal);
+            document.getElementById('edit-save-btn').addEventListener('click', saveEdit);
+            document.getElementById('edit-image-file').addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    editImageFile = this.files[0];
+                    const reader = new FileReader();
+                    reader.onload = (e) => { document.getElementById('edit-image-thumb').src = e.target.result; };
+                    reader.readAsDataURL(editImageFile);
+                }
+            });
+
+            document.getElementById('edit-title').focus();
+        }
+
+        function closeEditModal() {
+            const overlay = document.getElementById('edit-overlay');
+            if (overlay) overlay.remove();
+            editImageFile = null;
+        }
+
+        async function saveEdit() {
+            const overlay = document.getElementById('edit-overlay');
+            if (!overlay) return;
+            const projectId = overlay.dataset.projectId;
+            const title = document.getElementById('edit-title').value.trim();
+            const desc = document.getElementById('edit-desc').value.trim();
+            const url = document.getElementById('edit-url').value.trim() || null;
+
+            if (!title) { alert('Title is required.'); return; }
+
+            const saveBtn = document.getElementById('edit-save-btn');
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Saving...';
+
+            try {
+                const updates = { title, description: desc, project_url: url };
+
+                if (editImageFile) {
+                    const ext = editImageFile.name.split('.').pop();
+                    const path = currentUserId + '/' + Date.now() + '.' + ext;
+                    const { error: uploadError } = await sb.storage
+                        .from('project-images')
+                        .upload(path, editImageFile);
+                    if (uploadError) {
+                        alert('Image upload failed: ' + uploadError.message);
+                        saveBtn.disabled = false;
+                        saveBtn.textContent = 'Save changes';
+                        return;
+                    }
+                    const { data: urlData } = sb.storage.from('project-images').getPublicUrl(path);
+                    updates.image_url = urlData.publicUrl;
+                }
+
+                const { error } = await sb
+                    .from('projects')
+                    .update(updates)
+                    .eq('id', projectId)
+                    .eq('member_id', currentUserId);
+
+                if (error) {
+                    alert('Save failed: ' + error.message);
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = 'Save changes';
+                    return;
+                }
+
+                closeEditModal();
+                init(); // Re-fetch and re-render
+            } catch(e) {
+                alert('Error: ' + e.message);
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Save changes';
+            }
+        }
+
+        async function deleteProject(projectId) {
+            if (!confirm('Delete this project? This cannot be undone.')) return;
+
+            const { error } = await sb
+                .from('projects')
+                .delete()
+                .eq('id', projectId)
+                .eq('member_id', currentUserId);
+
+            if (error) {
+                alert('Delete failed: ' + error.message);
+                return;
+            }
+
+            init(); // Re-fetch and re-render
+        }
+
+        async function signOut() {
+            await sb.auth.signOut();
+            window.location.href = 'index.html';
+        }
+
+        init();
+    </script>
+</body>
+</html>

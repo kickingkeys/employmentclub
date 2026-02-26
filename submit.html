@@ -219,6 +219,28 @@
             margin-top: 2px;
         }
 
+        /* Top-right nav */
+        .top-nav {
+            position: fixed; top: 1.2rem; right: 1.2rem;
+            display: flex; gap: 8px;
+            z-index: 100;
+        }
+        .top-nav a {
+            display: flex; align-items: center; gap: 5px;
+            padding: 7px 12px;
+            font-family: var(--sans);
+            font-size: 0.7rem; font-weight: 600;
+            color: var(--muted);
+            text-decoration: none;
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            transition: all 0.2s ease;
+        }
+        .top-nav a:hover { background: rgba(255,255,255,0.9); color: var(--text); }
+        .top-nav svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
         /* Hidden */
         .hidden { display: none !important; }
 
@@ -243,8 +265,8 @@
 <body>
     <div class="container">
         <img src="logo.png" alt="Employment Club" class="logo">
-        <h1 class="page-title">Submit your work</h1>
-        <p class="page-desc">Share what you've been making. Upload a project image and it'll appear on the Employment Club canvas.</p>
+        <h1 class="page-title">Employment Club</h1>
+        <p class="page-desc">Sign in with your email to submit projects to the canvas.</p>
 
         <div id="status" class="status"></div>
 
@@ -255,8 +277,8 @@
                 <label>Email</label>
                 <input type="email" id="email-input" placeholder="your@email.com">
             </div>
-            <button class="btn btn-primary" id="magic-link-btn" onclick="sendMagicLink()">
-                Send magic link
+            <button class="btn btn-primary" id="sign-in-btn" onclick="loginWithEmail()">
+                Sign in
             </button>
         </div>
 
@@ -306,7 +328,7 @@
                 <div class="drop-zone" id="drop-zone" onclick="document.getElementById('project-file').click()">
                     <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                     <span class="drop-zone-text">Drop an image or click to browse</span>
-                    <span class="drop-zone-hint">PNG, JPG, or GIF — transparent backgrounds work best</span>
+                    <span class="drop-zone-hint">PNG, JPG, or GIF (animated OK) — transparent backgrounds work best</span>
                 </div>
                 <input type="file" id="project-file" accept="image/png,image/jpeg,image/gif" style="display:none" onchange="previewProject(this)">
             </div>
@@ -323,9 +345,20 @@
             <button class="btn btn-ghost" onclick="resetForm()">Submit another</button>
         </div>
 
-        <a href="index.html" class="back-link">
+        <a href="index.html" class="back-link" id="back-link">
             <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
             Back to canvas
+        </a>
+    </div>
+
+    <div class="top-nav hidden" id="top-nav">
+        <a href="profile.html">
+            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Profile
+        </a>
+        <a href="index.html">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>
+            Canvas
         </a>
     </div>
 
@@ -335,26 +368,26 @@
         const SUPABASE_KEY = 'sb_publishable__I5kMfVhw4D-LIfJiAdZMg_MZdj-ixV';
         const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+        const SHARED_PASSWORD = 'employment-club-2026';
+
         let currentUser = null;
         let currentProfile = null;
         let avatarFile = null;
         let projectFile = null;
+
+        function showNavLinks() {
+            document.getElementById('top-nav').classList.remove('hidden');
+            document.getElementById('back-link').style.display = 'none';
+        }
 
         // Check auth state on load
         async function init() {
             const { data: { session } } = await sb.auth.getSession();
             if (session) {
                 currentUser = session.user;
+                showNavLinks();
                 await checkProfile();
             }
-
-            // Listen for auth changes (magic link redirect)
-            sb.auth.onAuthStateChange(async (event, session) => {
-                if (event === 'SIGNED_IN' && session) {
-                    currentUser = session.user;
-                    await checkProfile();
-                }
-            });
         }
 
         async function checkProfile() {
@@ -391,44 +424,33 @@
             document.getElementById('status').style.display = 'none';
         }
 
-        // Auth: magic link
-        async function sendMagicLink() {
+        // Auth: email + shared password
+        async function loginWithEmail() {
             const email = document.getElementById('email-input').value.trim().toLowerCase();
             if (!email) { setStatus('Please enter your email.', 'error'); return; }
 
-            const btn = document.getElementById('magic-link-btn');
+            const btn = document.getElementById('sign-in-btn');
             btn.disabled = true;
-            btn.innerHTML = '<span class="spinner"></span>Checking...';
+            btn.innerHTML = '<span class="spinner"></span>Signing in...';
 
-            // Check if email is on the allow-list
-            const { data: allowed } = await sb
-                .from('allowed_emails')
-                .select('email')
-                .eq('email', email)
-                .single();
-
-            if (!allowed) {
-                setStatus('This email isn\'t on the invite list. Ask a member to add you!', 'error');
-                btn.disabled = false;
-                btn.textContent = 'Send magic link';
-                return;
-            }
-
-            btn.innerHTML = '<span class="spinner"></span>Sending...';
-
-            const redirectUrl = window.location.origin + window.location.pathname;
-            const { error } = await sb.auth.signInWithOtp({
+            const { error } = await sb.auth.signInWithPassword({
                 email,
-                options: { emailRedirectTo: redirectUrl }
+                password: SHARED_PASSWORD
             });
 
             if (error) {
-                setStatus(error.message, 'error');
+                // Generic message — covers both "not on list" and wrong password
+                setStatus('This email isn\'t on the invite list. Ask a member to add you!', 'error');
                 btn.disabled = false;
-                btn.textContent = 'Send magic link';
+                btn.textContent = 'Sign in';
             } else {
-                setStatus('Check your email! Click the link to sign in.', 'success');
-                btn.textContent = 'Link sent';
+                const { data: { session } } = await sb.auth.getSession();
+                if (session) {
+                    currentUser = session.user;
+                    clearStatus();
+                    showNavLinks();
+                    await checkProfile();
+                }
             }
         }
 
@@ -488,17 +510,38 @@
             }
         }
 
+        // Aspect ratio limits: no wider than 3:1, no taller than 1:3
+        const MAX_ASPECT = 3;   // width / height
+        const MIN_ASPECT = 1/3; // width / height
+
         // Project submission
         function previewProject(input) {
             if (input.files && input.files[0]) {
-                projectFile = input.files[0];
+                const file = input.files[0];
                 const zone = document.getElementById('drop-zone');
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    zone.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
-                    zone.classList.add('has-image');
+                    const img = new Image();
+                    img.onload = () => {
+                        const aspect = img.width / img.height;
+                        if (aspect > MAX_ASPECT) {
+                            setStatus('Image is too wide (max 3:1 ratio). Try a less panoramic image.', 'error');
+                            input.value = '';
+                            return;
+                        }
+                        if (aspect < MIN_ASPECT) {
+                            setStatus('Image is too tall (max 1:3 ratio). Try a less narrow image.', 'error');
+                            input.value = '';
+                            return;
+                        }
+                        projectFile = file;
+                        clearStatus();
+                        zone.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+                        zone.classList.add('has-image');
+                    };
+                    img.src = e.target.result;
                 };
-                reader.readAsDataURL(projectFile);
+                reader.readAsDataURL(file);
             }
         }
 
