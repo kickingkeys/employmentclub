@@ -402,17 +402,15 @@
             .float-desc { font-size: 0.5rem; }
             .float-creator { font-size: 0.5rem; }
 
-            /* Sticky top bar */
+            /* Mobile top bar — no fill, transparent */
             .m-topbar {
                 display: flex; align-items: center;
-                position: fixed; top: 0; left: 0; right: 0;
+                position: absolute; top: 10px; left: 12px; right: 12px;
                 z-index: 300;
-                padding: 10px 12px;
-                background: rgba(245,240,235,0.85);
-                backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-                border-bottom: 1px solid rgba(0,0,0,0.04);
                 gap: 10px;
+                pointer-events: none;
             }
+            .m-topbar > * { pointer-events: auto; }
             .m-topbar-logo {
                 width: 36px; height: auto; flex-shrink: 0;
                 filter: drop-shadow(0 2px 6px rgba(0,0,0,0.06));
@@ -596,50 +594,36 @@
             const mobileMembers = document.getElementById('m-topbar-members');
             if (mobileMembers) mobileMembers.innerHTML = '';
             members.forEach((m, i) => {
-                const name = typeof m === 'string' ? m : m.name;
+                const fullName = typeof m === 'string' ? m : m.name;
+                const firstName = fullName.split(' ')[0];
                 const website = typeof m === 'string' ? null : m.website;
-                if (website) {
-                    const el = document.createElement('a');
-                    el.className = 'member';
-                    el.href = safeUrl(website);
-                    el.target = '_blank';
-                    el.rel = 'noopener noreferrer';
-                    el.textContent = name;
-                    membersList.appendChild(el);
-                } else {
-                    const el = document.createElement('span');
+
+                function makeEl(tag, name) {
+                    const el = document.createElement(tag);
                     el.className = 'member';
                     el.textContent = name;
-                    membersList.appendChild(el);
+                    if (tag === 'a' && website) {
+                        el.href = safeUrl(website);
+                        el.target = '_blank';
+                        el.rel = 'noopener noreferrer';
+                    }
+                    return el;
                 }
-                if (i < members.length - 1) {
+                function makeSep() {
                     const sep = document.createElement('span');
                     sep.className = 'member-sep';
                     sep.textContent = '\u00b7';
-                    membersList.appendChild(sep);
+                    return sep;
                 }
-                // Also populate mobile top bar
+
+                // Desktop hub — first name
+                membersList.appendChild(makeEl(website ? 'a' : 'span', firstName));
+                if (i < members.length - 1) membersList.appendChild(makeSep());
+
+                // Mobile top bar — first name
                 if (mobileMembers) {
-                    if (website) {
-                        const mel = document.createElement('a');
-                        mel.className = 'member';
-                        mel.href = safeUrl(website);
-                        mel.target = '_blank';
-                        mel.rel = 'noopener noreferrer';
-                        mel.textContent = name;
-                        mobileMembers.appendChild(mel);
-                    } else {
-                        const mel = document.createElement('span');
-                        mel.className = 'member';
-                        mel.textContent = name;
-                        mobileMembers.appendChild(mel);
-                    }
-                    if (i < members.length - 1) {
-                        const msep = document.createElement('span');
-                        msep.className = 'member-sep';
-                        msep.textContent = '\u00b7';
-                        mobileMembers.appendChild(msep);
-                    }
+                    mobileMembers.appendChild(makeEl(website ? 'a' : 'span', firstName));
+                    if (i < members.length - 1) mobileMembers.appendChild(makeSep());
                 }
             });
         }
