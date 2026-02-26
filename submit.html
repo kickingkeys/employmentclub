@@ -306,9 +306,9 @@
                 <div class="drop-zone" id="drop-zone" onclick="document.getElementById('project-file').click()">
                     <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                     <span class="drop-zone-text">Drop an image or click to browse</span>
-                    <span class="drop-zone-hint">PNG with transparent background works best</span>
+                    <span class="drop-zone-hint">PNG, JPG, or GIF — transparent backgrounds work best</span>
                 </div>
-                <input type="file" id="project-file" accept="image/png,image/jpeg" style="display:none" onchange="previewProject(this)">
+                <input type="file" id="project-file" accept="image/png,image/jpeg,image/gif" style="display:none" onchange="previewProject(this)">
             </div>
             <button class="btn btn-primary" id="submit-btn" onclick="submitProject()">
                 Submit project
