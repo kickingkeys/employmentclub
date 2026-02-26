@@ -517,22 +517,42 @@
             });
         }
 
-        // Calculate position for new project on canvas
+        // Calculate position for new project — avoids collisions
         async function getCanvasPosition() {
-            const { count } = await sb.from('projects').select('*', { count: 'exact', head: true });
-            const idx = count || 0;
+            const { data: existing } = await sb.from('projects').select('canvas_x, canvas_y');
+            const taken = (existing || []).map(p => ({ x: p.canvas_x, y: p.canvas_y }));
+            const minDist = 320; // minimum px between project centers
 
-            let radius, ringSize;
-            if (idx < 10) { radius = 550; ringSize = 10; }
-            else if (idx < 20) { radius = 850; ringSize = 10; }
-            else { radius = 1100; ringSize = 12; }
+            function tooClose(x, y) {
+                return taken.some(p => Math.sqrt((p.x - x) ** 2 + (p.y - y) ** 2) < minDist);
+            }
 
-            const posInRing = idx < 10 ? idx : (idx < 20 ? idx - 10 : idx - 20);
-            const angle = (posInRing / ringSize) * Math.PI * 2 + (Math.random() * 0.3 - 0.15);
-            const x = Math.round(Math.cos(angle) * radius + (Math.random() * 60 - 30));
-            const y = Math.round(Math.sin(angle) * radius + (Math.random() * 60 - 30));
+            const count = taken.length;
+            const rings = [
+                { radius: 420, slots: 8 },
+                { radius: 680, slots: 12 },
+                { radius: 950, slots: 16 },
+            ];
+
+            // Try ring slots first
+            for (const ring of rings) {
+                for (let i = 0; i < ring.slots; i++) {
+                    const angle = (i / ring.slots) * Math.PI * 2 + (Math.random() * 0.2 - 0.1);
+                    const x = Math.round(Math.cos(angle) * ring.radius + (Math.random() * 40 - 20));
+                    const y = Math.round(Math.sin(angle) * ring.radius + (Math.random() * 40 - 20));
+                    if (!tooClose(x, y)) {
+                        const rotation = Math.round((Math.random() * 8 - 4) * 100) / 100;
+                        return { canvas_x: x, canvas_y: y, rotation };
+                    }
+                }
+            }
+
+            // Fallback: random position on expanding spiral
+            const angle = count * 2.4; // golden angle
+            const r = 400 + count * 60;
+            const x = Math.round(Math.cos(angle) * r);
+            const y = Math.round(Math.sin(angle) * r);
             const rotation = Math.round((Math.random() * 8 - 4) * 100) / 100;
-
             return { canvas_x: x, canvas_y: y, rotation };
         }
 
