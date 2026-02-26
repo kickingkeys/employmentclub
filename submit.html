@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit — Employment Club</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f5f0eb;
+            --text: #1a1a1a;
+            --muted: #8a8178;
+            --border: rgba(0,0,0,0.08);
+            --sans: 'Inter', system-ui, -apple-system, sans-serif;
+            --serif: 'Lora', Georgia, serif;
+            --hand: 'Caveat', cursive;
+            --ease: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--sans);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 3rem 1.5rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 440px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Header */
+        .logo { width: 120px; margin-bottom: 1.5rem; filter: drop-shadow(0 8px 16px rgba(0,0,0,0.06)); }
+        .page-title {
+            font-family: var(--serif);
+            font-size: 1.6rem; font-weight: 400; font-style: italic;
+            margin-bottom: 0.6rem; text-align: center;
+        }
+        .page-desc {
+            font-size: 0.82rem; color: var(--muted);
+            text-align: center; line-height: 1.6;
+            margin-bottom: 2.5rem; max-width: 340px;
+        }
+
+        /* Sections */
+        .section {
+            width: 100%;
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: fadeUp 0.6s var(--ease) forwards;
+        }
+
+        .section-label {
+            font-size: 0.6rem; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 1.5px;
+            color: rgba(0,0,0,0.25); margin-bottom: 1rem;
+        }
+
+        /* Form elements */
+        .field { margin-bottom: 1.2rem; }
+        .field label {
+            display: block;
+            font-size: 0.72rem; font-weight: 600;
+            color: var(--muted); margin-bottom: 0.4rem;
+            letter-spacing: 0.3px;
+        }
+
+        input[type="text"], input[type="email"], textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: rgba(255,255,255,0.6);
+            backdrop-filter: blur(8px);
+            font-family: var(--sans);
+            font-size: 0.88rem;
+            color: var(--text);
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        input:focus, textarea:focus {
+            border-color: rgba(0,0,0,0.15);
+            box-shadow: 0 0 0 3px rgba(0,0,0,0.03);
+        }
+        textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+
+        /* Avatar upload */
+        .avatar-upload {
+            display: flex; align-items: center; gap: 16px;
+        }
+        .avatar-preview {
+            width: 56px; height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #e0d5c9, #c4b8ab);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; color: rgba(0,0,0,0.2);
+            overflow: hidden; flex-shrink: 0;
+            border: 2px solid rgba(255,255,255,0.8);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .avatar-preview img { width: 100%; height: 100%; object-fit: cover; }
+
+        .upload-btn {
+            font-family: var(--sans);
+            font-size: 0.75rem; font-weight: 600;
+            color: var(--muted);
+            background: rgba(255,255,255,0.5);
+            border: 1px dashed var(--border);
+            border-radius: 8px;
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .upload-btn:hover { background: rgba(255,255,255,0.8); border-color: rgba(0,0,0,0.15); }
+
+        /* Image drop zone */
+        .drop-zone {
+            width: 100%;
+            min-height: 180px;
+            border: 2px dashed var(--border);
+            border-radius: 14px;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            background: rgba(255,255,255,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        .drop-zone:hover, .drop-zone.dragover {
+            border-color: rgba(0,0,0,0.2);
+            background: rgba(255,255,255,0.6);
+        }
+        .drop-zone.has-image {
+            border-style: solid;
+            border-color: rgba(0,0,0,0.06);
+        }
+        .drop-zone svg { width: 28px; height: 28px; stroke: var(--muted); fill: none; stroke-width: 1.5; }
+        .drop-zone-text { font-size: 0.75rem; color: var(--muted); }
+        .drop-zone img {
+            max-width: 100%; max-height: 300px;
+            border-radius: 8px;
+            object-fit: contain;
+        }
+
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-family: var(--sans);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s var(--ease);
+        }
+        .btn-primary {
+            background: var(--text);
+            color: #f5f0eb;
+        }
+        .btn-primary:hover { background: #333; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--muted);
+            border: 1px solid var(--border);
+        }
+        .btn-ghost:hover { background: rgba(255,255,255,0.5); }
+
+        /* Status messages */
+        .status {
+            font-size: 0.78rem;
+            text-align: center;
+            padding: 10px 16px;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        .status.success { display: block; background: rgba(67,233,123,0.1); color: #2d8a4e; }
+        .status.error { display: block; background: rgba(240,93,251,0.1); color: #c0365e; }
+        .status.info { display: block; background: rgba(161,196,253,0.1); color: #4a6fa5; }
+
+        /* Back link */
+        .back-link {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 0.75rem; font-weight: 500;
+            color: var(--muted); text-decoration: none;
+            margin-top: 2rem;
+            transition: color 0.2s ease;
+        }
+        .back-link:hover { color: var(--text); }
+        .back-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+        /* Field hints & counts */
+        .field-hint {
+            font-weight: 400; color: rgba(0,0,0,0.25);
+            font-size: 0.65rem; letter-spacing: 0;
+        }
+        .char-count {
+            display: block; text-align: right;
+            font-size: 0.62rem; color: rgba(0,0,0,0.2);
+            margin-top: 4px;
+        }
+        .drop-zone-hint {
+            font-size: 0.65rem; color: rgba(0,0,0,0.2);
+            margin-top: 2px;
+        }
+
+        /* Hidden */
+        .hidden { display: none !important; }
+
+        /* Spinner */
+        .spinner {
+            width: 16px; height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            display: inline-block; vertical-align: middle;
+            margin-right: 6px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeUp {
+            0% { opacity: 0; transform: translateY(12px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="logo.png" alt="Employment Club" class="logo">
+        <h1 class="page-title">Submit your work</h1>
+        <p class="page-desc">Share what you've been making. Upload a project image and it'll appear on the Employment Club canvas.</p>
+
+        <div id="status" class="status"></div>
+
+        <!-- Step 1: Auth -->
+        <div id="auth-section" class="section" style="animation-delay: 0.1s">
+            <div class="section-label">Sign in</div>
+            <div class="field">
+                <label>Email</label>
+                <input type="email" id="email-input" placeholder="your@email.com">
+            </div>
+            <button class="btn btn-primary" id="magic-link-btn" onclick="sendMagicLink()">
+                Send magic link
+            </button>
+        </div>
+
+        <!-- Step 2: Profile setup (shown after auth if no profile) -->
+        <div id="profile-section" class="section hidden">
+            <div class="section-label">Set up your profile</div>
+            <div class="field">
+                <label>Name</label>
+                <input type="text" id="name-input" placeholder="What should we call you?" maxlength="30">
+            </div>
+            <div class="field">
+                <label>Avatar</label>
+                <div class="avatar-upload">
+                    <div class="avatar-preview" id="avatar-preview">?</div>
+                    <label class="upload-btn" for="avatar-file">Choose image</label>
+                    <input type="file" id="avatar-file" accept="image/*" style="display:none" onchange="previewAvatar(this)">
+                </div>
+            </div>
+            <div class="field" style="margin-top: 1.2rem">
+                <label>Website <span class="field-hint">— optional, links your name on the canvas</span></label>
+                <input type="text" id="website-input" placeholder="https://yoursite.com">
+            </div>
+            <button class="btn btn-primary" id="save-profile-btn" onclick="saveProfile()">
+                Save profile
+            </button>
+        </div>
+
+        <!-- Step 3: Project submission (shown after profile is set) -->
+        <div id="submit-section" class="section hidden">
+            <div class="section-label">New project</div>
+            <div class="field">
+                <label>Title <span class="field-hint">— max 50 characters</span></label>
+                <input type="text" id="project-title" placeholder="What did you make?" maxlength="50" oninput="updateCount(this, 'title-count', 50)">
+                <span class="char-count" id="title-count">0 / 50</span>
+            </div>
+            <div class="field">
+                <label>Description <span class="field-hint">— one short line, max 120 characters</span></label>
+                <textarea id="project-desc" placeholder="A short line about the project..." maxlength="120" rows="2" oninput="updateCount(this, 'desc-count', 120)"></textarea>
+                <span class="char-count" id="desc-count">0 / 120</span>
+            </div>
+            <div class="field">
+                <label>Project link <span class="field-hint">— optional, where people can try it</span></label>
+                <input type="text" id="project-url" placeholder="https://your-project.com">
+            </div>
+            <div class="field">
+                <label>Project image</label>
+                <div class="drop-zone" id="drop-zone" onclick="document.getElementById('project-file').click()">
+                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    <span class="drop-zone-text">Drop an image or click to browse</span>
+                    <span class="drop-zone-hint">PNG with transparent background works best</span>
+                </div>
+                <input type="file" id="project-file" accept="image/png,image/jpeg" style="display:none" onchange="previewProject(this)">
+            </div>
+            <button class="btn btn-primary" id="submit-btn" onclick="submitProject()">
+                Submit project
+            </button>
+        </div>
+
+        <!-- Success state -->
+        <div id="success-section" class="section hidden" style="text-align:center">
+            <div style="font-size: 2rem; margin-bottom: 1rem;">&#10024;</div>
+            <div class="page-title" style="margin-bottom: 0.5rem;">Project submitted!</div>
+            <p class="page-desc">It's now live on the Employment Club canvas.</p>
+            <button class="btn btn-ghost" onclick="resetForm()">Submit another</button>
+        </div>
+
+        <a href="index.html" class="back-link">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            Back to canvas
+        </a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://pqzyhiyohiruvkjtqsii.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable__I5kMfVhw4D-LIfJiAdZMg_MZdj-ixV';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let currentUser = null;
+        let currentProfile = null;
+        let avatarFile = null;
+        let projectFile = null;
+
+        // Check auth state on load
+        async function init() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                currentUser = session.user;
+                await checkProfile();
+            }
+
+            // Listen for auth changes (magic link redirect)
+            supabase.auth.onAuthStateChange(async (event, session) => {
+                if (event === 'SIGNED_IN' && session) {
+                    currentUser = session.user;
+                    await checkProfile();
+                }
+            });
+        }
+
+        async function checkProfile() {
+            const { data: profile } = await supabase
+                .from('members')
+                .select('*')
+                .eq('id', currentUser.id)
+                .single();
+
+            if (profile) {
+                currentProfile = profile;
+                showSection('submit');
+            } else {
+                showSection('profile');
+            }
+        }
+
+        function showSection(name) {
+            document.getElementById('auth-section').classList.add('hidden');
+            document.getElementById('profile-section').classList.add('hidden');
+            document.getElementById('submit-section').classList.add('hidden');
+            document.getElementById('success-section').classList.add('hidden');
+            document.getElementById(name + '-section').classList.remove('hidden');
+        }
+
+        function setStatus(msg, type) {
+            const el = document.getElementById('status');
+            el.textContent = msg;
+            el.className = 'status ' + type;
+        }
+
+        function clearStatus() {
+            document.getElementById('status').className = 'status';
+            document.getElementById('status').style.display = 'none';
+        }
+
+        // Auth: magic link
+        async function sendMagicLink() {
+            const email = document.getElementById('email-input').value.trim().toLowerCase();
+            if (!email) { setStatus('Please enter your email.', 'error'); return; }
+
+            const btn = document.getElementById('magic-link-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span>Checking...';
+
+            // Check if email is on the allow-list
+            const { data: allowed } = await supabase
+                .from('allowed_emails')
+                .select('email')
+                .eq('email', email)
+                .single();
+
+            if (!allowed) {
+                setStatus('This email isn\'t on the invite list. Ask a member to add you!', 'error');
+                btn.disabled = false;
+                btn.textContent = 'Send magic link';
+                return;
+            }
+
+            btn.innerHTML = '<span class="spinner"></span>Sending...';
+
+            const redirectUrl = window.location.origin + window.location.pathname;
+            const { error } = await supabase.auth.signInWithOtp({
+                email,
+                options: { emailRedirectTo: redirectUrl }
+            });
+
+            if (error) {
+                setStatus(error.message, 'error');
+                btn.disabled = false;
+                btn.textContent = 'Send magic link';
+            } else {
+                setStatus('Check your email! Click the link to sign in.', 'success');
+                btn.textContent = 'Link sent';
+            }
+        }
+
+        // Profile
+        function previewAvatar(input) {
+            if (input.files && input.files[0]) {
+                avatarFile = input.files[0];
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    document.getElementById('avatar-preview').innerHTML =
+                        `<img src="${e.target.result}" alt="Avatar">`;
+                };
+                reader.readAsDataURL(avatarFile);
+            }
+        }
+
+        async function saveProfile() {
+            const name = document.getElementById('name-input').value.trim();
+            if (!name) { setStatus('Please enter a name.', 'error'); return; }
+
+            const btn = document.getElementById('save-profile-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span>Saving...';
+
+            let avatar_url = null;
+
+            // Upload avatar if provided
+            if (avatarFile) {
+                const ext = avatarFile.name.split('.').pop();
+                const path = `${currentUser.id}/avatar.${ext}`;
+                const { error: uploadError } = await supabase.storage
+                    .from('avatars')
+                    .upload(path, avatarFile, { upsert: true });
+
+                if (!uploadError) {
+                    const { data: urlData } = supabase.storage
+                        .from('avatars')
+                        .getPublicUrl(path);
+                    avatar_url = urlData.publicUrl;
+                }
+            }
+
+            const website = document.getElementById('website-input').value.trim() || null;
+
+            const { error } = await supabase
+                .from('members')
+                .insert({ id: currentUser.id, name, avatar_url, website });
+
+            if (error) {
+                setStatus(error.message, 'error');
+                btn.disabled = false;
+                btn.textContent = 'Save profile';
+            } else {
+                currentProfile = { name, avatar_url, website };
+                clearStatus();
+                showSection('submit');
+            }
+        }
+
+        // Project submission
+        function previewProject(input) {
+            if (input.files && input.files[0]) {
+                projectFile = input.files[0];
+                const zone = document.getElementById('drop-zone');
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    zone.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+                    zone.classList.add('has-image');
+                };
+                reader.readAsDataURL(projectFile);
+            }
+        }
+
+        // Drag & drop
+        const dropZone = document.getElementById('drop-zone');
+        if (dropZone) {
+            dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+            dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('dragover'); });
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+                if (e.dataTransfer.files.length) {
+                    document.getElementById('project-file').files = e.dataTransfer.files;
+                    previewProject(document.getElementById('project-file'));
+                }
+            });
+        }
+
+        // Calculate position for new project on canvas
+        async function getCanvasPosition() {
+            const { count } = await supabase.from('projects').select('*', { count: 'exact', head: true });
+            const idx = count || 0;
+
+            let radius, ringSize;
+            if (idx < 10) { radius = 550; ringSize = 10; }
+            else if (idx < 20) { radius = 850; ringSize = 10; }
+            else { radius = 1100; ringSize = 12; }
+
+            const posInRing = idx < 10 ? idx : (idx < 20 ? idx - 10 : idx - 20);
+            const angle = (posInRing / ringSize) * Math.PI * 2 + (Math.random() * 0.3 - 0.15);
+            const x = Math.round(Math.cos(angle) * radius + (Math.random() * 60 - 30));
+            const y = Math.round(Math.sin(angle) * radius + (Math.random() * 60 - 30));
+            const rotation = Math.round((Math.random() * 8 - 4) * 100) / 100;
+
+            return { canvas_x: x, canvas_y: y, rotation };
+        }
+
+        async function submitProject() {
+            const title = document.getElementById('project-title').value.trim();
+            const desc = document.getElementById('project-desc').value.trim();
+            const projectUrl = document.getElementById('project-url').value.trim() || null;
+
+            if (!title) { setStatus('Please enter a title.', 'error'); return; }
+            if (!projectFile) { setStatus('Please upload a project image.', 'error'); return; }
+
+            const btn = document.getElementById('submit-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span>Uploading...';
+
+            // Upload image
+            const ext = projectFile.name.split('.').pop();
+            const path = `${currentUser.id}/${Date.now()}.${ext}`;
+            const { error: uploadError } = await supabase.storage
+                .from('project-images')
+                .upload(path, projectFile);
+
+            if (uploadError) {
+                setStatus('Upload failed: ' + uploadError.message, 'error');
+                btn.disabled = false;
+                btn.textContent = 'Submit project';
+                return;
+            }
+
+            const { data: urlData } = supabase.storage
+                .from('project-images')
+                .getPublicUrl(path);
+
+            // Get canvas position
+            const pos = await getCanvasPosition();
+
+            // Insert project
+            const { error } = await supabase.from('projects').insert({
+                member_id: currentUser.id,
+                title,
+                description: desc,
+                project_url: projectUrl,
+                image_url: urlData.publicUrl,
+                ...pos,
+                width: 250
+            });
+
+            if (error) {
+                setStatus('Submission failed: ' + error.message, 'error');
+                btn.disabled = false;
+                btn.textContent = 'Submit project';
+            } else {
+                clearStatus();
+                showSection('success');
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('project-title').value = '';
+            document.getElementById('project-desc').value = '';
+            document.getElementById('project-url').value = '';
+            projectFile = null;
+            const zone = document.getElementById('drop-zone');
+            zone.innerHTML = `
+                <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <span class="drop-zone-text">Drop an image or click to browse</span>
+            `;
+            zone.classList.remove('has-image');
+            document.getElementById('submit-btn').disabled = false;
+            document.getElementById('submit-btn').textContent = 'Submit project';
+            showSection('submit');
+        }
+
+        function updateCount(el, countId, max) {
+            document.getElementById(countId).textContent = el.value.length + ' / ' + max;
+        }
+
+        init();
+    </script>
+</body>
+</html>
