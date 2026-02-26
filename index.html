@@ -123,7 +123,7 @@
         .center-hub > * { pointer-events: auto; }
 
         .center-logo {
-            width: 180px; height: auto;
+            width: 120px; height: auto;
             margin-bottom: 1rem;
             filter: drop-shadow(0 4px 12px rgba(0,0,0,0.04)) drop-shadow(0 20px 40px rgba(0,0,0,0.06));
             transition: transform 0.4s var(--ease-out);
@@ -273,6 +273,17 @@
         .float-link:hover { color: rgba(0,0,0,0.5); }
         .float-link svg { width: 8px; height: 8px; stroke: currentColor; fill: none; stroke-width: 2.5; }
 
+        /* Name above image, top-right aligned */
+        .float-nametag {
+            display: block;
+            text-align: right;
+            font-family: var(--hand);
+            font-size: 0.85rem;
+            color: rgba(0,0,0,0.35);
+            padding-bottom: 3px;
+            pointer-events: none;
+        }
+
         /* --- Owner Controls --- */
         .owner-controls {
             position: absolute;
@@ -397,10 +408,12 @@
             /* Hide center hub on canvas — moved to sticky top bar */
             .center-hub { display: none !important; }
 
-            /* Float objects: slightly smaller text */
+            /* Float objects: slightly smaller text, show info without hover */
             .float-title { font-size: 0.9rem; }
             .float-desc { font-size: 0.5rem; }
             .float-creator { font-size: 0.5rem; }
+            .float-meta { opacity: 1; }
+            .float-link { opacity: 1; }
 
             /* Mobile top bar — no fill, transparent */
             .m-topbar {
@@ -645,8 +658,9 @@
         }
 
         // Render a single floating object on the canvas
-        const mobilePos = window.innerWidth <= 600 ? 0.5 : 1; // bring items closer on mobile
-        const mobileSize = window.innerWidth <= 600 ? 180 : 250; // smaller items on mobile
+        const isMobileCanvas = window.innerWidth <= 600;
+        const mobilePos = isMobileCanvas ? 0.5 : 1; // bring items closer on mobile
+        const itemSize = isMobileCanvas ? 180 : 132; // desktop 132, mobile stays 180
 
         function renderObject(obj, delay, skipAnim) {
             const el = document.createElement('div');
@@ -655,7 +669,7 @@
                 el.dataset.id = obj.id;
                 projectsData.set(obj.id, obj);
             }
-            const w = mobilePos < 1 ? mobileSize : (obj.w || obj.width || 250);
+            const w = itemSize;
             el.style.width = w + 'px';
             const x = (obj.x || obj.canvas_x || 0) * mobilePos;
             const y = (obj.y || obj.canvas_y || 0) * mobilePos;
@@ -689,19 +703,25 @@
 
             const linkHtml = url ? `<a class="float-link" href="${url}" target="_blank" rel="noopener noreferrer">View project <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></a>` : '';
 
+            const firstName = creator.split(' ')[0];
             const creatorHtml = creatorWebsite
-                ? `<a class="float-creator" href="${creatorWebsite}" target="_blank" rel="noopener noreferrer">${creator}</a>`
-                : `<span class="float-creator">${creator}</span>`;
+                ? `<a class="float-creator" href="${creatorWebsite}" target="_blank" rel="noopener noreferrer">${firstName}</a>`
+                : `<span class="float-creator">${firstName}</span>`;
+
+            const imgHtml = url
+                ? `<a href="${url}" target="_blank" rel="noopener noreferrer"><img class="float-img" src="${imgSrc}" alt="${title}"></a>`
+                : `<img class="float-img" src="${imgSrc}" alt="${title}">`;
+
+            const nameTagHtml = firstName ? `<span class="float-nametag">${esc(firstName)}</span>` : '';
 
             el.innerHTML = `
                 ${ownerHtml}
-                <img class="float-img" src="${imgSrc}" alt="${title}">
+                ${nameTagHtml}
+                ${imgHtml}
                 <div class="float-info">
                     <div class="float-title">${title}</div>
                     <div class="float-meta">
                         <span class="float-desc">${desc}</span>
-                        <span class="float-dot"></span>
-                        ${creatorHtml}
                     </div>
                     ${linkHtml}
                 </div>
