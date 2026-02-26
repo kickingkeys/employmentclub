@@ -424,7 +424,7 @@
             document.getElementById('status').style.display = 'none';
         }
 
-        // Auth: email + shared password
+        // Auth: email + shared password (auto-signup if on invite list)
         async function loginWithEmail() {
             const email = document.getElementById('email-input').value.trim().toLowerCase();
             if (!email) { setStatus('Please enter your email.', 'error'); return; }
@@ -433,14 +433,28 @@
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner"></span>Signing in...';
 
-            const { error } = await sb.auth.signInWithPassword({
-                email,
-                password: SHARED_PASSWORD
-            });
+            // Check invite list first
+            const { data: allowed } = await sb.from('allowed_emails').select('email').eq('email', email).single();
+            if (!allowed) {
+                setStatus('This email isn\'t on the invite list. Ask a member to add you!', 'error');
+                btn.disabled = false;
+                btn.textContent = 'Sign in';
+                return;
+            }
+
+            // Try sign in
+            let { error } = await sb.auth.signInWithPassword({ email, password: SHARED_PASSWORD });
+
+            // If no account yet, sign up then sign in
+            if (error) {
+                const { error: signUpErr } = await sb.auth.signUp({ email, password: SHARED_PASSWORD });
+                if (!signUpErr) {
+                    ({ error } = await sb.auth.signInWithPassword({ email, password: SHARED_PASSWORD }));
+                }
+            }
 
             if (error) {
-                // Generic message — covers both "not on list" and wrong password
-                setStatus('This email isn\'t on the invite list. Ask a member to add you!', 'error');
+                setStatus('Something went wrong. Please try again.', 'error');
                 btn.disabled = false;
                 btn.textContent = 'Sign in';
             } else {
