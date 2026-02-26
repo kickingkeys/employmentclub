@@ -333,7 +333,7 @@
     <script>
         const SUPABASE_URL = 'https://pqzyhiyohiruvkjtqsii.supabase.co';
         const SUPABASE_KEY = 'sb_publishable__I5kMfVhw4D-LIfJiAdZMg_MZdj-ixV';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let currentUser = null;
         let currentProfile = null;
@@ -342,14 +342,14 @@
 
         // Check auth state on load
         async function init() {
-            const { data: { session } } = await supabase.auth.getSession();
+            const { data: { session } } = await sb.auth.getSession();
             if (session) {
                 currentUser = session.user;
                 await checkProfile();
             }
 
             // Listen for auth changes (magic link redirect)
-            supabase.auth.onAuthStateChange(async (event, session) => {
+            sb.auth.onAuthStateChange(async (event, session) => {
                 if (event === 'SIGNED_IN' && session) {
                     currentUser = session.user;
                     await checkProfile();
@@ -417,7 +417,7 @@
             btn.innerHTML = '<span class="spinner"></span>Sending...';
 
             const redirectUrl = window.location.origin + window.location.pathname;
-            const { error } = await supabase.auth.signInWithOtp({
+            const { error } = await sb.auth.signInWithOtp({
                 email,
                 options: { emailRedirectTo: redirectUrl }
             });
@@ -459,12 +459,12 @@
             if (avatarFile) {
                 const ext = avatarFile.name.split('.').pop();
                 const path = `${currentUser.id}/avatar.${ext}`;
-                const { error: uploadError } = await supabase.storage
+                const { error: uploadError } = await sb.storage
                     .from('avatars')
                     .upload(path, avatarFile, { upsert: true });
 
                 if (!uploadError) {
-                    const { data: urlData } = supabase.storage
+                    const { data: urlData } = sb.storage
                         .from('avatars')
                         .getPublicUrl(path);
                     avatar_url = urlData.publicUrl;
@@ -519,7 +519,7 @@
 
         // Calculate position for new project on canvas
         async function getCanvasPosition() {
-            const { count } = await supabase.from('projects').select('*', { count: 'exact', head: true });
+            const { count } = await sb.from('projects').select('*', { count: 'exact', head: true });
             const idx = count || 0;
 
             let radius, ringSize;
@@ -551,7 +551,7 @@
             // Upload image
             const ext = projectFile.name.split('.').pop();
             const path = `${currentUser.id}/${Date.now()}.${ext}`;
-            const { error: uploadError } = await supabase.storage
+            const { error: uploadError } = await sb.storage
                 .from('project-images')
                 .upload(path, projectFile);
 
@@ -562,7 +562,7 @@
                 return;
             }
 
-            const { data: urlData } = supabase.storage
+            const { data: urlData } = sb.storage
                 .from('project-images')
                 .getPublicUrl(path);
 
@@ -570,7 +570,7 @@
             const pos = await getCanvasPosition();
 
             // Insert project
-            const { error } = await supabase.from('projects').insert({
+            const { error } = await sb.from('projects').insert({
                 member_id: currentUser.id,
                 title,
                 description: desc,
