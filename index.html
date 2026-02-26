@@ -384,102 +384,61 @@
 
         .hidden { display: none !important; }
 
-        /* --- Mobile View (scrollable spatial canvas) --- */
-        .mobile-view { display: none; }
-
+        /* --- Mobile --- */
         @media (min-width: 601px) {
             .explore-hint { display: none; }
-            .mobile-view { display: none !important; }
         }
 
         @media (max-width: 600px) {
-            body {
-                overflow-x: hidden; overflow-y: auto;
-                overscroll-behavior: auto;
-                height: auto; min-height: 100vh;
-                cursor: default;
-                background: radial-gradient(ellipse at top center, #f8f4ef 0%, #ece5db 100%);
-            }
-            body.is-dragging { cursor: default !important; }
-            body.is-dragging * { cursor: default !important; }
-            .viewport, .ui-overlay, .explore-hint, .corner-secret { display: none !important; }
+            /* Smaller center hub */
+            .center-logo { width: 100px; margin-bottom: 0.5rem; }
+            .center-hub { width: 280px; }
+            .members-label { font-size: 0.6rem; margin-bottom: 0.3rem; }
+            .member { font-size: 0.65rem; }
+            .member-sep { font-size: 0.65rem; margin: 0 4px; }
+            .mission-desc { font-size: 0.58rem; max-width: 240px; }
+            .mission-attribution { font-size: 0.85rem; }
 
-            .mobile-view {
-                display: block;
-                position: relative;
-                width: 100%;
-                min-height: 100vh;
-            }
+            /* Float objects: slightly smaller text on mobile */
+            .float-title { font-size: 0.9rem; }
+            .float-desc { font-size: 0.5rem; }
+            .float-creator { font-size: 0.5rem; }
 
-            /* Mobile hub — compact, top center */
-            .m-hub {
-                display: flex; flex-direction: column; align-items: center;
-                text-align: center;
-                padding: 2rem 1rem 0;
-                position: relative; z-index: 10;
+            /* Controls at bottom center */
+            .ui-overlay {
+                bottom: 0; left: 0; right: 0;
+                justify-content: center;
+                padding: 0 0 max(1rem, env(safe-area-inset-bottom));
             }
-            .m-hub-logo {
-                width: 60px; height: auto;
-                filter: drop-shadow(0 4px 10px rgba(0,0,0,0.05));
-                margin-bottom: 0.6rem;
-            }
-            .m-hub-members {
-                display: flex; flex-wrap: wrap; justify-content: center;
-                gap: 0; max-width: 300px;
-                margin-bottom: 0.5rem;
-            }
-            .m-hub-members .member { font-size: 0.65rem; }
-            .m-hub-members .member-sep { font-size: 0.65rem; margin: 0 4px; }
-            .m-hub-desc {
-                font-family: var(--serif); font-style: italic;
-                font-size: 0.58rem; line-height: 1.5;
-                color: rgba(0,0,0,0.3);
-                max-width: 260px; margin-bottom: 0.3rem;
-            }
-            .m-hub-attribution {
-                font-family: var(--hand);
-                font-size: 0.8rem; color: rgba(0,0,0,0.18);
-                text-decoration: none;
-            }
+            .ui-btn { padding: 8px 12px; font-size: 0.65rem; }
 
-            /* Scattered items container */
-            .m-scatter {
-                position: relative;
-                width: 100%;
-                /* height set dynamically by JS */
-            }
+            /* Hide sign-in dot on mobile */
+            .corner-secret { display: none; }
 
-            /* Each floating item — same aesthetic as desktop canvas */
-            .m-float {
-                position: absolute;
-                filter: drop-shadow(0 3px 8px rgba(0,0,0,0.04)) drop-shadow(0 12px 28px rgba(0,0,0,0.06));
-                transition: filter 0.3s ease;
-                opacity: 0;
-                animation: mFloatIn 0.6s var(--ease-out) forwards;
+            /* Hide explore hint after first interaction */
+            .explore-hint {
+                position: fixed; bottom: 4.5rem; left: 50%;
+                transform: translateX(-50%);
+                display: flex; flex-direction: column; align-items: center; gap: 4px;
+                z-index: 100; pointer-events: none;
+                animation: hintPulse 2.5s ease-in-out infinite;
             }
-            .m-float img {
-                width: 100%; height: auto; display: block;
-                pointer-events: none;
+            .explore-hint span {
+                font-family: var(--sans);
+                font-size: 0.6rem; font-weight: 600;
+                letter-spacing: 0.5px; text-transform: uppercase;
+                color: rgba(0,0,0,0.2);
             }
-            .m-float-title {
-                font-family: var(--hand);
-                font-size: 0.85rem; font-weight: 600;
-                color: rgba(0,0,0,0.4);
-                text-align: center;
-                line-height: 1.1;
-                margin-top: 5px;
-            }
-            .m-float-creator {
-                font-size: 0.5rem; font-weight: 600;
-                color: rgba(0,0,0,0.18);
-                text-align: center;
-                margin-top: 1px;
+            .explore-hint svg {
+                width: 18px; height: 18px;
+                stroke: rgba(0,0,0,0.15); fill: none;
+                stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
             }
         }
 
-        @keyframes mFloatIn {
-            0% { opacity: 0; transform: scale(0.9); }
-            100% { opacity: 1; transform: scale(1); }
+        @keyframes hintPulse {
+            0%, 100% { opacity: 0.6; transform: translateX(-50%) translateY(0); }
+            50% { opacity: 1; transform: translateX(-50%) translateY(4px); }
         }
 
         /* --- Animations --- */
@@ -526,17 +485,6 @@
         </div>
     </div>
 
-    <!-- Mobile scrollable spatial view (hidden on desktop) -->
-    <div class="mobile-view" id="mobile-view">
-        <div class="m-hub">
-            <img src="logo.png" alt="Employment Club" class="m-hub-logo">
-            <div class="m-hub-members" id="m-members"></div>
-            <p class="m-hub-desc">This club is a space for my friends to work on projects together and put their work out to help land a job.</p>
-            <a class="m-hub-attribution" href="https://surya.website" target="_blank">— Surya</a>
-        </div>
-        <div class="m-scatter" id="m-scatter"></div>
-    </div>
-
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const SUPABASE_URL = 'https://pqzyhiyohiruvkjtqsii.supabase.co';
@@ -578,125 +526,6 @@
                     membersList.appendChild(sep);
                 }
             });
-        }
-
-        // Mobile: render members into mobile hub
-        function renderMobileMembers(members) {
-            const el = document.getElementById('m-members');
-            if (!el) return;
-            el.innerHTML = '';
-            members.forEach((m, i) => {
-                const name = typeof m === 'string' ? m : m.name;
-                const website = typeof m === 'string' ? null : m.website;
-                if (website) {
-                    const a = document.createElement('a');
-                    a.className = 'member';
-                    a.href = safeUrl(website);
-                    a.target = '_blank';
-                    a.rel = 'noopener noreferrer';
-                    a.textContent = name;
-                    el.appendChild(a);
-                } else {
-                    const s = document.createElement('span');
-                    s.className = 'member';
-                    s.textContent = name;
-                    el.appendChild(s);
-                }
-                if (i < members.length - 1) {
-                    const sep = document.createElement('span');
-                    sep.className = 'member-sep';
-                    sep.textContent = '\u00b7';
-                    el.appendChild(sep);
-                }
-            });
-        }
-
-        // Mobile: scattered spatial layout
-        const mPlaced = []; // track placed item rects for collision
-
-        function renderMobileScatter(projects) {
-            const scatter = document.getElementById('m-scatter');
-            if (!scatter) return;
-            scatter.innerHTML = '';
-            mPlaced.length = 0;
-            if (!projects || projects.length === 0) return;
-
-            const vw = window.innerWidth;
-            const pad = 12;
-            // Vary item widths for organic feel
-            const sizes = [110, 130, 150, 120, 140, 160];
-            let cursorY = 20; // start below hub
-
-            projects.forEach((p, i) => {
-                const w = sizes[i % sizes.length];
-                const el = createMobileFloat(p, w);
-                const rot = (Math.random() * 6 - 3);
-                el.style.width = w + 'px';
-                el.style.transform = `rotate(${rot.toFixed(1)}deg)`;
-                el.style.animationDelay = (i * 0.08) + 's';
-
-                // Find a position that doesn't collide
-                const pos = findMobilePosition(w, vw, pad, cursorY);
-                el.style.left = pos.x + 'px';
-                el.style.top = pos.y + 'px';
-
-                // Estimate height (image is roughly square-ish + title ~30px)
-                const estH = w * 0.85 + 30;
-                mPlaced.push({ x: pos.x, y: pos.y, w: w, h: estH });
-
-                scatter.appendChild(el);
-
-                // Advance cursor every 2-3 items
-                if ((i + 1) % 2 === 0) {
-                    cursorY = pos.y + estH * 0.3;
-                }
-            });
-
-            // Set container height
-            if (mPlaced.length > 0) {
-                const maxBottom = Math.max(...mPlaced.map(r => r.y + r.h));
-                scatter.style.height = (maxBottom + 40) + 'px';
-            }
-        }
-
-        function findMobilePosition(itemW, vw, pad, startY) {
-            const maxX = vw - itemW - pad;
-            const estH = itemW * 0.85 + 30;
-
-            // Try random positions, check for overlap
-            for (let attempt = 0; attempt < 30; attempt++) {
-                const x = pad + Math.random() * (maxX - pad);
-                const y = startY + Math.random() * 60;
-
-                let collides = false;
-                for (const r of mPlaced) {
-                    const overlapX = x < r.x + r.w + 8 && x + itemW + 8 > r.x;
-                    const overlapY = y < r.y + r.h + 8 && y + estH + 8 > r.y;
-                    if (overlapX && overlapY) { collides = true; break; }
-                }
-                if (!collides) return { x, y };
-            }
-
-            // Fallback: place below everything
-            const maxBottom = mPlaced.length > 0 ? Math.max(...mPlaced.map(r => r.y + r.h)) : startY;
-            return { x: pad + Math.random() * (maxX - pad), y: maxBottom + 16 };
-        }
-
-        function createMobileFloat(p, w) {
-            const el = document.createElement('div');
-            el.className = 'm-float';
-            if (p.id) el.dataset.id = p.id;
-
-            const imgSrc = esc(p.img || p.image_url || '');
-            const title = esc(p.title || '');
-            const creator = esc(p.creator || p.member_name || '');
-
-            el.innerHTML = `
-                <img src="${imgSrc}" alt="${title}" loading="lazy">
-                <div class="m-float-title">${title}</div>
-                <div class="m-float-creator">${creator}</div>
-            `;
-            return el;
         }
 
         // Escape HTML to prevent XSS
@@ -792,7 +621,6 @@
                 const { data: dbMembers } = await sb.from('members').select('name, website').order('name');
                 if (dbMembers && dbMembers.length > 0) {
                     renderMembers(dbMembers);
-                    renderMobileMembers(dbMembers);
                 }
 
                 // Fetch projects with member info
@@ -819,20 +647,6 @@
                         }, 0.3 + i * 0.06);
                     });
                 }
-                // Render mobile grid
-                if (dbProjects && dbProjects.length > 0) {
-                    const mobileData = dbProjects.map(p => ({
-                        id: p.id,
-                        member_id: p.member_id,
-                        img: p.image_url,
-                        title: p.title,
-                        desc: p.description,
-                        url: p.project_url,
-                        creator: p.members?.name || '',
-                        creator_website: p.members?.website || '',
-                    }));
-                    renderMobileScatter(mobileData);
-                }
             } catch(e) {
                 console.log('Supabase fetch failed', e);
             }
@@ -857,20 +671,6 @@
                         rot: p.rotation
                     };
                     renderObject(objData, 0);
-                    // Add to mobile scatter
-                    const mScatter = document.getElementById('m-scatter');
-                    if (mScatter) {
-                        const w = 130 + Math.random() * 30;
-                        const el = createMobileFloat(objData, w);
-                        const vw = window.innerWidth;
-                        const pos = findMobilePosition(w, vw, 12, 20);
-                        el.style.width = w + 'px';
-                        el.style.left = pos.x + 'px';
-                        el.style.top = pos.y + 'px';
-                        el.style.transform = `rotate(${(Math.random()*6-3).toFixed(1)}deg)`;
-                        mPlaced.push({ x: pos.x, y: pos.y, w, h: w * 0.85 + 30 });
-                        mScatter.appendChild(el);
-                    }
                 })
                 .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'projects' }, async (payload) => {
                     const p = payload.new;
@@ -892,37 +692,19 @@
                         rot: p.rotation
                     };
                     renderObject(objData, 0, true);
-                    // Update mobile scatter item
-                    const mScatter2 = document.getElementById('m-scatter');
-                    if (mScatter2) {
-                        const oldMFloat = mScatter2.querySelector('[data-id="' + p.id + '"]');
-                        if (oldMFloat) {
-                            const newFloat = createMobileFloat(objData, parseInt(oldMFloat.style.width) || 140);
-                            newFloat.style.cssText = oldMFloat.style.cssText;
-                            newFloat.style.opacity = '1';
-                            newFloat.style.animation = 'none';
-                            oldMFloat.replaceWith(newFloat);
-                        }
-                    }
                 })
                 .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'projects' }, (payload) => {
                     const id = payload.old.id;
                     const oldEl = container.querySelector('[data-id="' + id + '"]');
                     if (oldEl) oldEl.remove();
                     projectsData.delete(id);
-                    // Remove from mobile scatter
-                    const mScatter3 = document.getElementById('m-scatter');
-                    if (mScatter3) {
-                        const mFloat = mScatter3.querySelector('[data-id="' + id + '"]');
-                        if (mFloat) mFloat.remove();
-                    }
                 })
                 .subscribe();
 
             sb.channel('members-realtime')
                 .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'members' }, async () => {
                     const { data: dbMembers } = await sb.from('members').select('name, website').order('name');
-                    if (dbMembers) { renderMembers(dbMembers); renderMobileMembers(dbMembers); }
+                    if (dbMembers) renderMembers(dbMembers);
                 })
                 .subscribe();
         }
@@ -948,9 +730,9 @@
                     profileBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Profile';
                     overlay.insertBefore(profileBtn, overlay.firstChild);
 
-                    // Hide corner secret on mobile too (sign-in is secret)
-                    const cs = document.getElementById('corner-secret');
-                    if (cs) cs.style.display = 'none';
+                    // Hide corner-secret when logged in
+                    const csEl = document.getElementById('corner-secret');
+                    if (csEl) csEl.style.display = 'none';
                 }
             } catch(e) {}
         }
@@ -1171,7 +953,7 @@
         const centerHub = document.getElementById('center-hub');
 
         const isMobile = window.innerWidth <= 600;
-        let state = { x: 0, y: 0, scale: isMobile ? 0.65 : 1 };
+        let state = { x: 0, y: 0, scale: isMobile ? 0.75 : 1 };
         let isDragging = false;
         let dragStartX, dragStartY;
         let zoomTimeout;
@@ -1191,7 +973,7 @@
         centerBtn.addEventListener('click', () => {
             canvas.classList.remove('is-zooming');
             canvas.classList.add('is-animating');
-            state.x = 0; state.y = 0; state.scale = isMobile ? 0.65 : 1;
+            state.x = 0; state.y = 0; state.scale = isMobile ? 0.75 : 1;
             updateTransform();
             setTimeout(() => canvas.classList.remove('is-animating'), 550);
         });
