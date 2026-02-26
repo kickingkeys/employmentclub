@@ -545,6 +545,9 @@
         }
 
         // Render a single floating object on the canvas
+        const mobilePos = window.innerWidth <= 600 ? 0.5 : 1; // bring items closer on mobile
+        const mobileSize = window.innerWidth <= 600 ? 180 : 250; // smaller items on mobile
+
         function renderObject(obj, delay, skipAnim) {
             const el = document.createElement('div');
             el.className = 'float-obj';
@@ -552,14 +555,15 @@
                 el.dataset.id = obj.id;
                 projectsData.set(obj.id, obj);
             }
-            el.style.width = (obj.w || obj.width || 250) + 'px';
-            const x = obj.x || obj.canvas_x || 0;
-            const y = obj.y || obj.canvas_y || 0;
+            const w = mobilePos < 1 ? mobileSize : (obj.w || obj.width || 250);
+            el.style.width = w + 'px';
+            const x = (obj.x || obj.canvas_x || 0) * mobilePos;
+            const y = (obj.y || obj.canvas_y || 0) * mobilePos;
             const rot = obj.rot || obj.rotation || 0;
             el.style.setProperty('--tx', x + 'px');
             el.style.setProperty('--ty', y + 'px');
             el.style.setProperty('--rot', rot + 'deg');
-            el.style.left = -(obj.w || obj.width || 250) / 2 + 'px';
+            el.style.left = -w / 2 + 'px';
             el.style.top = '-80px';
             el.style.transform = `translate(${x}px, ${y}px) rotate(${rot}deg)`;
             el.style.animationDelay = delay + 's';
@@ -953,7 +957,7 @@
         const centerHub = document.getElementById('center-hub');
 
         const isMobile = window.innerWidth <= 600;
-        let state = { x: 0, y: 0, scale: isMobile ? 0.75 : 1 };
+        let state = { x: 0, y: 0, scale: isMobile ? 0.55 : 1 };
         let isDragging = false;
         let dragStartX, dragStartY;
         let zoomTimeout;
@@ -973,7 +977,7 @@
         centerBtn.addEventListener('click', () => {
             canvas.classList.remove('is-zooming');
             canvas.classList.add('is-animating');
-            state.x = 0; state.y = 0; state.scale = isMobile ? 0.75 : 1;
+            state.x = 0; state.y = 0; state.scale = isMobile ? 0.55 : 1;
             updateTransform();
             setTimeout(() => canvas.classList.remove('is-animating'), 550);
         });
