@@ -65,6 +65,24 @@
             stroke: currentColor; stroke-width: 2;
             stroke-linecap: round; stroke-linejoin: round;
         }
+        a.ui-btn { text-decoration: none; }
+
+        /* Subtle login icon — bottom-right corner */
+        .corner-secret {
+            position: fixed; bottom: 12px; right: 12px;
+            z-index: 999;
+            width: 28px; height: 28px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.7rem;
+            color: rgba(0,0,0,0.08);
+            text-decoration: none;
+            border-radius: 6px;
+            transition: color 0.3s ease, background 0.3s ease;
+        }
+        .corner-secret:hover {
+            color: rgba(0,0,0,0.3);
+            background: rgba(0,0,0,0.03);
+        }
 
         /* --- Viewport & Canvas --- */
         .viewport {
@@ -255,6 +273,155 @@
         .float-link:hover { color: rgba(0,0,0,0.5); }
         .float-link svg { width: 8px; height: 8px; stroke: currentColor; fill: none; stroke-width: 2.5; }
 
+        /* --- Owner Controls --- */
+        .owner-controls {
+            position: absolute;
+            top: 6px; right: 6px;
+            display: flex; gap: 4px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: auto;
+            z-index: 5;
+        }
+        .float-obj:hover .owner-controls { opacity: 1; }
+
+        .owner-btn {
+            width: 26px; height: 26px;
+            border-radius: 8px; border: none;
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(8px);
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+        .owner-btn:hover { background: #fff; transform: scale(1.08); }
+        .owner-btn svg {
+            width: 12px; height: 12px;
+            stroke: rgba(0,0,0,0.4); fill: none;
+            stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+        }
+        .owner-btn.delete-btn:hover svg { stroke: #c0365e; }
+
+        /* --- Edit Modal --- */
+        .edit-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.25);
+            backdrop-filter: blur(4px);
+            z-index: 500;
+            display: flex; align-items: center; justify-content: center;
+            padding: 1.5rem; cursor: default;
+        }
+        .edit-modal {
+            background: var(--bg);
+            border-radius: 18px; padding: 2rem;
+            width: 100%; max-width: 420px;
+            box-shadow: 0 24px 80px rgba(0,0,0,0.15);
+            user-select: auto;
+        }
+        .edit-header {
+            font-family: var(--serif);
+            font-size: 1.2rem; font-weight: 400; font-style: italic;
+            margin-bottom: 1.5rem; text-align: center;
+        }
+        .edit-field { margin-bottom: 1rem; }
+        .edit-field label {
+            display: block;
+            font-size: 0.72rem; font-weight: 600;
+            color: var(--muted); margin-bottom: 0.4rem;
+            letter-spacing: 0.3px;
+        }
+        .edit-field input[type="text"],
+        .edit-field textarea {
+            width: 100%; padding: 10px 14px;
+            border: 1px solid rgba(0,0,0,0.08);
+            border-radius: 10px;
+            background: rgba(255,255,255,0.6);
+            font-family: var(--sans); font-size: 0.88rem;
+            color: var(--text); outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            user-select: auto;
+        }
+        .edit-field input:focus,
+        .edit-field textarea:focus {
+            border-color: rgba(0,0,0,0.15);
+            box-shadow: 0 0 0 3px rgba(0,0,0,0.03);
+        }
+        .edit-field textarea { resize: vertical; min-height: 60px; line-height: 1.5; }
+        .edit-image-row { display: flex; align-items: center; gap: 12px; }
+        .edit-thumb {
+            width: 56px; height: 56px;
+            border-radius: 8px; object-fit: cover;
+            background: linear-gradient(135deg, #e0d5c9, #c4b8ab);
+            flex-shrink: 0;
+        }
+        .edit-change-btn {
+            font-family: var(--sans);
+            font-size: 0.72rem; font-weight: 600;
+            color: var(--muted);
+            background: rgba(255,255,255,0.5);
+            border: 1px dashed rgba(0,0,0,0.08);
+            border-radius: 8px; padding: 6px 14px;
+            cursor: pointer; transition: all 0.2s ease;
+        }
+        .edit-change-btn:hover { background: rgba(255,255,255,0.8); }
+        .edit-actions { display: flex; gap: 8px; margin-top: 1.5rem; }
+        .edit-cancel, .edit-save {
+            flex: 1; padding: 10px; border-radius: 12px;
+            font-family: var(--sans); font-size: 0.82rem; font-weight: 600;
+            cursor: pointer; transition: all 0.2s ease;
+        }
+        .edit-cancel {
+            border: 1px solid rgba(0,0,0,0.08);
+            background: transparent; color: var(--muted);
+        }
+        .edit-cancel:hover { background: rgba(255,255,255,0.5); }
+        .edit-save {
+            border: none; background: var(--text); color: #f5f0eb;
+        }
+        .edit-save:hover { background: #333; }
+        .edit-save:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        /* --- Mobile --- */
+        @media (max-width: 600px) {
+            .center-logo { width: 120px; margin-bottom: 0.6rem; }
+            .center-hub { width: 300px; }
+            .members-label { font-size: 0.65rem; margin-bottom: 0.3rem; }
+            .member { font-size: 0.72rem; }
+            .member-sep { font-size: 0.72rem; margin: 0 5px; }
+            .mission-desc { font-size: 0.65rem; max-width: 260px; }
+            .mission-attribution { font-size: 0.9rem; }
+            .ui-btn { padding: 6px 10px; font-size: 0.65rem; }
+
+            /* Hint arrow to explore */
+            .explore-hint {
+                position: fixed; bottom: 5rem; left: 50%;
+                transform: translateX(-50%);
+                display: flex; flex-direction: column; align-items: center; gap: 4px;
+                z-index: 100; pointer-events: none;
+                animation: hintPulse 2.5s ease-in-out infinite;
+            }
+            .explore-hint span {
+                font-family: var(--sans);
+                font-size: 0.6rem; font-weight: 600;
+                letter-spacing: 0.5px; text-transform: uppercase;
+                color: rgba(0,0,0,0.2);
+            }
+            .explore-hint svg {
+                width: 18px; height: 18px;
+                stroke: rgba(0,0,0,0.15); fill: none;
+                stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+            }
+        }
+        @media (min-width: 601px) {
+            .explore-hint { display: none; }
+        }
+
+        @keyframes hintPulse {
+            0%, 100% { opacity: 0.6; transform: translateX(-50%) translateY(0); }
+            50% { opacity: 1; transform: translateX(-50%) translateY(4px); }
+        }
+
         /* --- Animations --- */
         @keyframes fadeInHub {
             0% { opacity: 0; transform: translate(-50%, -46%) scale(0.94); }
@@ -269,12 +436,18 @@
 </head>
 <body>
 
+    <a href="submit.html" class="corner-secret" id="corner-secret" title="Sign in">&#9679;</a>
     <div class="ui-overlay">
         <div class="ui-btn" id="zoom-display">100%</div>
         <div class="ui-btn" id="center-btn" title="Back to center">
             <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>
             Center
         </div>
+    </div>
+
+    <div class="explore-hint" id="explore-hint">
+        <span>Drag to explore</span>
+        <svg viewBox="0 0 24 24"><path d="M5 9l7 7 7-7"/></svg>
     </div>
 
     <div class="viewport" id="viewport">
@@ -303,6 +476,9 @@
 
         const container = document.getElementById('objects-container');
         const membersList = document.getElementById('members-list');
+        let currentUserId = null;
+        const projectsData = new Map();
+        let editImageFile = null;
 
         // Render members list
         function renderMembers(members) {
@@ -350,10 +526,13 @@
         }
 
         // Render a single floating object on the canvas
-        function renderObject(obj, delay) {
+        function renderObject(obj, delay, skipAnim) {
             const el = document.createElement('div');
             el.className = 'float-obj';
-            if (obj.id) el.dataset.id = obj.id;
+            if (obj.id) {
+                el.dataset.id = obj.id;
+                projectsData.set(obj.id, obj);
+            }
             el.style.width = (obj.w || obj.width || 250) + 'px';
             const x = obj.x || obj.canvas_x || 0;
             const y = obj.y || obj.canvas_y || 0;
@@ -365,6 +544,7 @@
             el.style.top = '-80px';
             el.style.transform = `translate(${x}px, ${y}px) rotate(${rot}deg)`;
             el.style.animationDelay = delay + 's';
+            if (skipAnim) { el.style.animation = 'none'; el.style.opacity = '1'; }
 
             const imgSrc = esc(obj.img || obj.image_url || '');
             const title = esc(obj.title || '');
@@ -372,6 +552,17 @@
             const creator = esc(obj.creator || obj.member_name || '');
             const url = safeUrl(obj.url || obj.project_url || '');
             const creatorWebsite = safeUrl(obj.creator_website || '');
+            const isOwner = currentUserId && obj.member_id === currentUserId;
+
+            const ownerHtml = isOwner ? `
+                <div class="owner-controls">
+                    <button class="owner-btn edit-btn" title="Edit">
+                        <svg viewBox="0 0 24 24"><path d="M17 3a2.85 2.85 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+                    </button>
+                    <button class="owner-btn delete-btn" title="Delete">
+                        <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+                    </button>
+                </div>` : '';
 
             const linkHtml = url ? `<a class="float-link" href="${url}" target="_blank" rel="noopener noreferrer">View project <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></a>` : '';
 
@@ -380,6 +571,7 @@
                 : `<span class="float-creator">${creator}</span>`;
 
             el.innerHTML = `
+                ${ownerHtml}
                 <img class="float-img" src="${imgSrc}" alt="${title}">
                 <div class="float-info">
                     <div class="float-title">${title}</div>
@@ -391,6 +583,12 @@
                     ${linkHtml}
                 </div>
             `;
+
+            if (isOwner) {
+                el.querySelector('.edit-btn').addEventListener('click', (e) => { e.stopPropagation(); openEditModal(obj.id); });
+                el.querySelector('.delete-btn').addEventListener('click', (e) => { e.stopPropagation(); deleteProject(obj.id); });
+            }
+
             container.appendChild(el);
             return el;
         }
@@ -416,6 +614,7 @@
                     dbProjects.forEach((p, i) => {
                         renderObject({
                             id: p.id,
+                            member_id: p.member_id,
                             img: p.image_url,
                             title: p.title,
                             desc: p.description,
@@ -433,13 +632,14 @@
                 console.log('Supabase fetch failed', e);
             }
 
-            // Subscribe to realtime inserts
+            // Subscribe to realtime changes
             sb.channel('projects-realtime')
                 .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'projects' }, async (payload) => {
                     const p = payload.new;
                     const { data: member } = await sb.from('members').select('name, website').eq('id', p.member_id).single();
                     renderObject({
                         id: p.id,
+                        member_id: p.member_id,
                         img: p.image_url,
                         title: p.title,
                         desc: p.description,
@@ -452,6 +652,32 @@
                         rot: p.rotation
                     }, 0);
                 })
+                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'projects' }, async (payload) => {
+                    const p = payload.new;
+                    const oldEl = container.querySelector('[data-id="' + p.id + '"]');
+                    if (oldEl) oldEl.remove();
+                    const { data: member } = await sb.from('members').select('name, website').eq('id', p.member_id).single();
+                    renderObject({
+                        id: p.id,
+                        member_id: p.member_id,
+                        img: p.image_url,
+                        title: p.title,
+                        desc: p.description,
+                        url: p.project_url,
+                        creator: member?.name || '',
+                        creator_website: member?.website || '',
+                        w: p.width,
+                        x: p.canvas_x,
+                        y: p.canvas_y,
+                        rot: p.rotation
+                    }, 0, true);
+                })
+                .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'projects' }, (payload) => {
+                    const id = payload.old.id;
+                    const oldEl = container.querySelector('[data-id="' + id + '"]');
+                    if (oldEl) oldEl.remove();
+                    projectsData.delete(id);
+                })
                 .subscribe();
 
             sb.channel('members-realtime')
@@ -462,7 +688,237 @@
                 .subscribe();
         }
 
-        loadData();
+        // Auth-aware UI — set currentUserId before rendering, inject nav links
+        async function checkAuth() {
+            if (!sb) return;
+            try {
+                const { data: { session } } = await sb.auth.getSession();
+                if (session) {
+                    currentUserId = session.user.id;
+                    const overlay = document.querySelector('.ui-overlay');
+
+                    const submitBtn = document.createElement('a');
+                    submitBtn.href = 'submit.html';
+                    submitBtn.className = 'ui-btn';
+                    submitBtn.innerHTML = '<svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Submit';
+                    overlay.insertBefore(submitBtn, overlay.firstChild);
+
+                    const profileBtn = document.createElement('a');
+                    profileBtn.href = 'profile.html';
+                    profileBtn.className = 'ui-btn';
+                    profileBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Profile';
+                    overlay.insertBefore(profileBtn, overlay.firstChild);
+                }
+            } catch(e) {}
+        }
+
+        // Edit modal
+        function openEditModal(projectId) {
+            const data = projectsData.get(projectId);
+            if (!data) return;
+            editImageFile = null;
+
+            const overlay = document.createElement('div');
+            overlay.className = 'edit-overlay';
+            overlay.id = 'edit-overlay';
+            overlay.addEventListener('click', function(e) { if (e.target === this) closeEditModal(); });
+
+            const modal = document.createElement('div');
+            modal.className = 'edit-modal';
+            modal.addEventListener('click', function(e) { e.stopPropagation(); });
+            modal.innerHTML = `
+                <div class="edit-header">Edit project</div>
+                <div class="edit-field">
+                    <label>Title</label>
+                    <input type="text" id="edit-title" maxlength="50">
+                </div>
+                <div class="edit-field">
+                    <label>Description</label>
+                    <textarea id="edit-desc" maxlength="120" rows="2"></textarea>
+                </div>
+                <div class="edit-field">
+                    <label>Project link</label>
+                    <input type="text" id="edit-url" placeholder="https://...">
+                </div>
+                <div class="edit-field">
+                    <label>Image</label>
+                    <div class="edit-image-row">
+                        <img id="edit-image-thumb" class="edit-thumb" src="" alt="">
+                        <label class="edit-change-btn" for="edit-image-file">Change image</label>
+                        <input type="file" id="edit-image-file" accept="image/png,image/jpeg,image/gif" style="display:none">
+                        <span style="font-size:0.6rem;color:rgba(0,0,0,0.25);">PNG, JPG, or GIF (animated OK)</span>
+                    </div>
+                </div>
+                <div class="edit-actions">
+                    <button class="edit-cancel" id="edit-cancel-btn">Cancel</button>
+                    <button class="edit-save" id="edit-save-btn">Save changes</button>
+                </div>
+            `;
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+
+            // Set values safely via DOM (no HTML injection)
+            document.getElementById('edit-title').value = data.title || '';
+            document.getElementById('edit-desc').value = data.desc || '';
+            document.getElementById('edit-url').value = data.url || '';
+            document.getElementById('edit-image-thumb').src = data.img || '';
+            overlay.dataset.projectId = projectId;
+
+            document.getElementById('edit-cancel-btn').addEventListener('click', closeEditModal);
+            document.getElementById('edit-save-btn').addEventListener('click', saveEdit);
+            document.getElementById('edit-image-file').addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    editImageFile = this.files[0];
+                    const reader = new FileReader();
+                    reader.onload = (e) => { document.getElementById('edit-image-thumb').src = e.target.result; };
+                    reader.readAsDataURL(editImageFile);
+                }
+            });
+
+            // Focus title field
+            document.getElementById('edit-title').focus();
+        }
+
+        function closeEditModal() {
+            const overlay = document.getElementById('edit-overlay');
+            if (overlay) overlay.remove();
+            editImageFile = null;
+        }
+
+        async function saveEdit() {
+            const overlay = document.getElementById('edit-overlay');
+            if (!overlay) return;
+            const projectId = overlay.dataset.projectId;
+            const title = document.getElementById('edit-title').value.trim();
+            const desc = document.getElementById('edit-desc').value.trim();
+            const url = document.getElementById('edit-url').value.trim() || null;
+
+            if (!title) { alert('Title is required.'); return; }
+
+            const saveBtn = document.getElementById('edit-save-btn');
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Saving...';
+
+            try {
+                const updates = { title, description: desc, project_url: url };
+
+                if (editImageFile) {
+                    const ext = editImageFile.name.split('.').pop();
+                    const path = currentUserId + '/' + Date.now() + '.' + ext;
+                    const { error: uploadError } = await sb.storage
+                        .from('project-images')
+                        .upload(path, editImageFile);
+                    if (uploadError) {
+                        alert('Image upload failed: ' + uploadError.message);
+                        saveBtn.disabled = false;
+                        saveBtn.textContent = 'Save changes';
+                        return;
+                    }
+                    const { data: urlData } = sb.storage.from('project-images').getPublicUrl(path);
+                    updates.image_url = urlData.publicUrl;
+                }
+
+                const { error } = await sb
+                    .from('projects')
+                    .update(updates)
+                    .eq('id', projectId)
+                    .eq('member_id', currentUserId);
+
+                if (error) {
+                    alert('Save failed: ' + error.message);
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = 'Save changes';
+                    return;
+                }
+
+                // Update canvas immediately (realtime will also fire but handles gracefully)
+                const oldData = projectsData.get(projectId);
+                if (oldData) {
+                    const oldEl = container.querySelector('[data-id="' + projectId + '"]');
+                    if (oldEl) oldEl.remove();
+                    renderObject({
+                        ...oldData,
+                        title: title,
+                        desc: desc,
+                        url: url || '',
+                        img: updates.image_url || oldData.img
+                    }, 0, true);
+                }
+
+                closeEditModal();
+            } catch(e) {
+                alert('Error: ' + e.message);
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Save changes';
+            }
+        }
+
+        async function deleteProject(projectId) {
+            if (!confirm('Delete this project? This cannot be undone.')) return;
+
+            const { error } = await sb
+                .from('projects')
+                .delete()
+                .eq('id', projectId)
+                .eq('member_id', currentUserId);
+
+            if (error) {
+                alert('Delete failed: ' + error.message);
+                return;
+            }
+
+            const el = container.querySelector('[data-id="' + projectId + '"]');
+            if (el) el.remove();
+            projectsData.delete(projectId);
+        }
+
+        // Navigate to a specific project if hash contains project coords
+        function checkHashNavigation() {
+            const hash = window.location.hash;
+            if (!hash.startsWith('#project-')) return;
+            const params = new URLSearchParams(hash.split('&').slice(1).join('&'));
+            const x = parseFloat(params.get('x'));
+            const y = parseFloat(params.get('y'));
+            if (isNaN(x) || isNaN(y)) return;
+
+            // Center viewport on project coordinates
+            const vw = window.innerWidth / 2;
+            const vh = window.innerHeight / 2;
+            state.x = vw - x;
+            state.y = vh - y;
+            state.scale = 1;
+
+            canvas.classList.add('is-animating');
+            updateTransform();
+            setTimeout(() => canvas.classList.remove('is-animating'), 550);
+
+            // Highlight the project card briefly
+            const projectId = hash.split('#project-')[1].split('&')[0];
+            setTimeout(() => {
+                const el = container.querySelector('[data-id="' + projectId + '"]');
+                if (el) {
+                    el.style.transition = 'box-shadow 0.3s ease';
+                    el.style.boxShadow = '0 0 0 3px rgba(0,0,0,0.2)';
+                    setTimeout(() => { el.style.boxShadow = ''; }, 2000);
+                }
+            }, 600);
+
+            // Clean hash so refresh doesn't re-navigate
+            history.replaceState(null, '', window.location.pathname);
+        }
+
+        // Init: check auth first (sets currentUserId), then load data
+        (async () => {
+            await checkAuth();
+            await loadData();
+            checkHashNavigation();
+        })();
+
+        // Hide login icon when user is already signed in (nav buttons visible)
+        if (currentUserId) {
+            const cs = document.getElementById('corner-secret');
+            if (cs) cs.style.display = 'none';
+        }
 
         // --- Pan & Zoom ---
         const viewport = document.getElementById('viewport');
@@ -471,7 +927,8 @@
         const centerBtn = document.getElementById('center-btn');
         const centerHub = document.getElementById('center-hub');
 
-        let state = { x: 0, y: 0, scale: 1 };
+        const isMobile = window.innerWidth <= 600;
+        let state = { x: 0, y: 0, scale: isMobile ? 0.65 : 1 };
         let isDragging = false;
         let dragStartX, dragStartY;
         let zoomTimeout;
@@ -491,14 +948,20 @@
         centerBtn.addEventListener('click', () => {
             canvas.classList.remove('is-zooming');
             canvas.classList.add('is-animating');
-            state.x = 0; state.y = 0; state.scale = 1;
+            state.x = 0; state.y = 0; state.scale = isMobile ? 0.65 : 1;
             updateTransform();
             setTimeout(() => canvas.classList.remove('is-animating'), 550);
         });
 
+        function dismissHint() {
+            const hint = document.getElementById('explore-hint');
+            if (hint) hint.style.display = 'none';
+        }
+
         viewport.addEventListener('mousedown', (e) => {
-            if (e.target.closest('.ui-btn')) return;
+            if (e.target.closest('.ui-btn') || e.target.closest('.owner-controls')) return;
             isDragging = true;
+            dismissHint();
             document.body.classList.add('is-dragging');
             canvas.classList.remove('is-zooming', 'is-animating');
             dragStartX = e.clientX - state.x;
@@ -537,6 +1000,7 @@
         viewport.addEventListener('touchstart', (e) => {
             if (e.touches.length === 1) {
                 isDragging = true;
+                dismissHint();
                 canvas.classList.remove('is-zooming', 'is-animating');
                 dragStartX = e.touches[0].clientX - state.x;
                 dragStartY = e.touches[0].clientY - state.y;
@@ -572,7 +1036,13 @@
         }, { passive: false });
 
         viewport.addEventListener('touchend', () => { isDragging = false; });
-        window.addEventListener('keydown', (e) => { if (e.key === '0') centerBtn.click(); });
+        window.addEventListener('keydown', (e) => {
+            if (e.key === '0') centerBtn.click();
+            if (e.metaKey && e.shiftKey && e.key === 'k') {
+                e.preventDefault();
+                window.location.href = 'submit.html';
+            }
+        });
 
         updateTransform();
     </script>
