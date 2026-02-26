@@ -358,7 +358,7 @@
         }
 
         async function checkProfile() {
-            const { data: profile } = await supabase
+            const { data: profile } = await sb
                 .from('members')
                 .select('*')
                 .eq('id', currentUser.id)
@@ -401,7 +401,7 @@
             btn.innerHTML = '<span class="spinner"></span>Checking...';
 
             // Check if email is on the allow-list
-            const { data: allowed } = await supabase
+            const { data: allowed } = await sb
                 .from('allowed_emails')
                 .select('email')
                 .eq('email', email)
@@ -473,7 +473,7 @@
 
             const website = document.getElementById('website-input').value.trim() || null;
 
-            const { error } = await supabase
+            const { error } = await sb
                 .from('members')
                 .insert({ id: currentUser.id, name, avatar_url, website });
 
