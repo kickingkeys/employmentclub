@@ -382,44 +382,181 @@
         .edit-save:hover { background: #333; }
         .edit-save:disabled { opacity: 0.4; cursor: not-allowed; }
 
-        /* --- Mobile --- */
-        @media (max-width: 600px) {
-            .center-logo { width: 120px; margin-bottom: 0.6rem; }
-            .center-hub { width: 300px; }
-            .members-label { font-size: 0.65rem; margin-bottom: 0.3rem; }
-            .member { font-size: 0.72rem; }
-            .member-sep { font-size: 0.72rem; margin: 0 5px; }
-            .mission-desc { font-size: 0.65rem; max-width: 260px; }
-            .mission-attribution { font-size: 0.9rem; }
-            .ui-btn { padding: 6px 10px; font-size: 0.65rem; }
+        .hidden { display: none !important; }
 
-            /* Hint arrow to explore */
-            .explore-hint {
-                position: fixed; bottom: 5rem; left: 50%;
-                transform: translateX(-50%);
-                display: flex; flex-direction: column; align-items: center; gap: 4px;
-                z-index: 100; pointer-events: none;
-                animation: hintPulse 2.5s ease-in-out infinite;
-            }
-            .explore-hint span {
-                font-family: var(--sans);
-                font-size: 0.6rem; font-weight: 600;
-                letter-spacing: 0.5px; text-transform: uppercase;
-                color: rgba(0,0,0,0.2);
-            }
-            .explore-hint svg {
-                width: 18px; height: 18px;
-                stroke: rgba(0,0,0,0.15); fill: none;
-                stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
-            }
-        }
+        /* --- Mobile View (scrollable grid replaces canvas) --- */
+        .mobile-view { display: none; }
+
         @media (min-width: 601px) {
             .explore-hint { display: none; }
+            .mobile-view { display: none !important; }
         }
 
-        @keyframes hintPulse {
-            0%, 100% { opacity: 0.6; transform: translateX(-50%) translateY(0); }
-            50% { opacity: 1; transform: translateX(-50%) translateY(4px); }
+        @media (max-width: 600px) {
+            body {
+                overflow: auto;
+                overscroll-behavior: auto;
+                height: auto; min-height: 100vh;
+                cursor: default;
+            }
+            body.is-dragging { cursor: default !important; }
+            body.is-dragging * { cursor: default !important; }
+            .viewport, .ui-overlay, .explore-hint, .corner-secret { display: none !important; }
+
+            .mobile-view {
+                display: flex; flex-direction: column;
+                min-height: 100vh;
+                padding: 0 0 2rem 0;
+            }
+
+            /* Mobile header */
+            .m-header {
+                display: flex; flex-direction: column; align-items: center;
+                padding: 2.5rem 1.5rem 1.5rem;
+                text-align: center;
+            }
+            .m-logo {
+                width: 80px; height: auto;
+                filter: drop-shadow(0 4px 12px rgba(0,0,0,0.06));
+                margin-bottom: 1rem;
+            }
+            .m-title {
+                font-family: var(--serif); font-style: italic;
+                font-size: 0.7rem; font-weight: 400;
+                color: rgba(0,0,0,0.35);
+                letter-spacing: 0.2px;
+                margin-bottom: 0.8rem;
+            }
+            .m-members {
+                display: flex; flex-wrap: wrap; justify-content: center;
+                gap: 0; max-width: 320px;
+                margin-bottom: 1rem;
+            }
+            .m-members .member { font-size: 0.7rem; }
+            .m-members .member-sep { font-size: 0.7rem; margin: 0 5px; }
+            .m-desc {
+                font-family: var(--serif); font-style: italic;
+                font-size: 0.62rem; line-height: 1.55;
+                color: rgba(0,0,0,0.35);
+                max-width: 280px; margin-bottom: 0.4rem;
+            }
+            .m-attribution {
+                font-family: var(--hand);
+                font-size: 0.85rem; color: rgba(0,0,0,0.2);
+                text-decoration: none;
+            }
+
+            /* Mobile nav */
+            .m-nav {
+                display: flex; justify-content: center; gap: 8px;
+                padding: 0.8rem 1rem;
+            }
+            .m-nav a {
+                display: flex; align-items: center; gap: 5px;
+                padding: 7px 14px;
+                font-family: var(--sans);
+                font-size: 0.65rem; font-weight: 600;
+                color: var(--muted); text-decoration: none;
+                background: rgba(255,255,255,0.5);
+                border: 1px solid rgba(0,0,0,0.06);
+                border-radius: 9px;
+                transition: all 0.2s ease;
+            }
+            .m-nav a:hover { background: rgba(255,255,255,0.9); }
+            .m-nav svg {
+                width: 12px; height: 12px;
+                stroke: currentColor; fill: none; stroke-width: 2;
+                stroke-linecap: round; stroke-linejoin: round;
+            }
+
+            /* Mobile grid */
+            .m-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+                padding: 0 12px;
+            }
+
+            .m-card {
+                border-radius: 12px;
+                overflow: hidden;
+                background: rgba(255,255,255,0.4);
+                border: 1px solid rgba(0,0,0,0.04);
+                transition: all 0.25s var(--ease-out);
+                cursor: pointer;
+                user-select: none;
+            }
+            .m-card:active { transform: scale(0.98); }
+
+            .m-card-img {
+                width: 100%; display: block;
+                aspect-ratio: 1 / 1;
+                object-fit: cover;
+                background: linear-gradient(135deg, #e8e1d8, #d8cfc4);
+            }
+
+            .m-card-info {
+                padding: 8px 10px;
+            }
+            .m-card-title {
+                font-family: var(--hand);
+                font-size: 0.95rem; font-weight: 600;
+                color: rgba(0,0,0,0.5);
+                line-height: 1.15;
+            }
+            .m-card-creator {
+                font-size: 0.55rem; font-weight: 600;
+                color: rgba(0,0,0,0.2);
+                margin-top: 2px;
+                text-transform: uppercase;
+                letter-spacing: 0.3px;
+            }
+
+            /* Expanded card detail */
+            .m-card-detail {
+                max-height: 0; overflow: hidden;
+                transition: max-height 0.3s var(--ease-out), padding 0.3s var(--ease-out);
+                padding: 0 10px;
+            }
+            .m-card.expanded .m-card-detail {
+                max-height: 120px;
+                padding: 4px 10px 10px;
+            }
+            .m-card-desc {
+                font-size: 0.6rem; color: rgba(0,0,0,0.35);
+                line-height: 1.45; margin-bottom: 4px;
+            }
+            .m-card-link {
+                display: inline-flex; align-items: center; gap: 3px;
+                font-size: 0.55rem; font-weight: 600;
+                text-transform: uppercase; letter-spacing: 0.4px;
+                color: rgba(0,0,0,0.25); text-decoration: none;
+            }
+            .m-card-link:hover { color: rgba(0,0,0,0.5); }
+            .m-card-link svg {
+                width: 8px; height: 8px;
+                stroke: currentColor; fill: none; stroke-width: 2.5;
+            }
+
+            .m-empty {
+                grid-column: 1 / -1;
+                text-align: center;
+                padding: 3rem 1rem;
+                font-size: 0.75rem; color: rgba(0,0,0,0.2);
+                font-style: italic;
+            }
+
+            /* Mobile footer */
+            .m-footer {
+                display: flex; justify-content: center;
+                padding: 1.5rem;
+            }
+            .m-footer a {
+                font-size: 0.6rem; font-weight: 600;
+                color: rgba(0,0,0,0.15); text-decoration: none;
+                letter-spacing: 0.3px;
+            }
+            .m-footer a:hover { color: rgba(0,0,0,0.4); }
         }
 
         /* --- Animations --- */
@@ -466,6 +603,22 @@
         </div>
     </div>
 
+    <!-- Mobile scrollable view (hidden on desktop) -->
+    <div class="mobile-view" id="mobile-view">
+        <div class="m-header">
+            <img src="logo.png" alt="Employment Club" class="m-logo">
+            <div class="m-title">Members</div>
+            <div class="m-members" id="m-members"></div>
+            <p class="m-desc">This club is a space for my friends to work on projects together and put their work out to help land a job.</p>
+            <a class="m-attribution" href="https://surya.website" target="_blank">— Surya</a>
+        </div>
+        <div class="m-nav hidden" id="m-nav"></div>
+        <div class="m-grid" id="m-grid"></div>
+        <div class="m-footer">
+            <a href="submit.html" id="m-footer-link">Sign in</a>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const SUPABASE_URL = 'https://pqzyhiyohiruvkjtqsii.supabase.co';
@@ -507,6 +660,85 @@
                     membersList.appendChild(sep);
                 }
             });
+        }
+
+        // Mobile: render members into mobile header
+        function renderMobileMembers(members) {
+            const el = document.getElementById('m-members');
+            if (!el) return;
+            el.innerHTML = '';
+            members.forEach((m, i) => {
+                const name = typeof m === 'string' ? m : m.name;
+                const website = typeof m === 'string' ? null : m.website;
+                if (website) {
+                    const a = document.createElement('a');
+                    a.className = 'member';
+                    a.href = safeUrl(website);
+                    a.target = '_blank';
+                    a.rel = 'noopener noreferrer';
+                    a.textContent = name;
+                    el.appendChild(a);
+                } else {
+                    const s = document.createElement('span');
+                    s.className = 'member';
+                    s.textContent = name;
+                    el.appendChild(s);
+                }
+                if (i < members.length - 1) {
+                    const sep = document.createElement('span');
+                    sep.className = 'member-sep';
+                    sep.textContent = '\u00b7';
+                    el.appendChild(sep);
+                }
+            });
+        }
+
+        // Mobile: render project grid
+        function renderMobileGrid(projects) {
+            const grid = document.getElementById('m-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+            if (!projects || projects.length === 0) {
+                grid.innerHTML = '<div class="m-empty">No projects yet</div>';
+                return;
+            }
+            projects.forEach(p => {
+                grid.appendChild(createMobileCard(p));
+            });
+        }
+
+        function createMobileCard(p) {
+            const card = document.createElement('div');
+            card.className = 'm-card';
+            card.dataset.id = p.id;
+
+            const imgSrc = esc(p.img || p.image_url || '');
+            const title = esc(p.title || '');
+            const desc = esc(p.desc || p.description || '');
+            const creator = esc(p.creator || p.member_name || '');
+            const url = safeUrl(p.url || p.project_url || '');
+
+            const linkHtml = url
+                ? `<a class="m-card-link" href="${url}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">View project <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></a>`
+                : '';
+
+            card.innerHTML = `
+                <img class="m-card-img" src="${imgSrc}" alt="${title}" loading="lazy">
+                <div class="m-card-info">
+                    <div class="m-card-title">${title}</div>
+                    <div class="m-card-creator">${creator}</div>
+                </div>
+                <div class="m-card-detail">
+                    <div class="m-card-desc">${desc}</div>
+                    ${linkHtml}
+                </div>
+            `;
+
+            card.addEventListener('click', () => {
+                card.classList.toggle('expanded');
+            });
+
+            return card;
         }
 
         // Escape HTML to prevent XSS
@@ -602,6 +834,7 @@
                 const { data: dbMembers } = await sb.from('members').select('name, website').order('name');
                 if (dbMembers && dbMembers.length > 0) {
                     renderMembers(dbMembers);
+                    renderMobileMembers(dbMembers);
                 }
 
                 // Fetch projects with member info
@@ -628,6 +861,20 @@
                         }, 0.3 + i * 0.06);
                     });
                 }
+                // Render mobile grid
+                if (dbProjects && dbProjects.length > 0) {
+                    const mobileData = dbProjects.map(p => ({
+                        id: p.id,
+                        member_id: p.member_id,
+                        img: p.image_url,
+                        title: p.title,
+                        desc: p.description,
+                        url: p.project_url,
+                        creator: p.members?.name || '',
+                        creator_website: p.members?.website || '',
+                    }));
+                    renderMobileGrid(mobileData);
+                }
             } catch(e) {
                 console.log('Supabase fetch failed', e);
             }
@@ -637,7 +884,7 @@
                 .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'projects' }, async (payload) => {
                     const p = payload.new;
                     const { data: member } = await sb.from('members').select('name, website').eq('id', p.member_id).single();
-                    renderObject({
+                    const objData = {
                         id: p.id,
                         member_id: p.member_id,
                         img: p.image_url,
@@ -650,14 +897,22 @@
                         x: p.canvas_x,
                         y: p.canvas_y,
                         rot: p.rotation
-                    }, 0);
+                    };
+                    renderObject(objData, 0);
+                    // Add to mobile grid
+                    const mGrid = document.getElementById('m-grid');
+                    if (mGrid) {
+                        const empty = mGrid.querySelector('.m-empty');
+                        if (empty) empty.remove();
+                        mGrid.prepend(createMobileCard(objData));
+                    }
                 })
                 .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'projects' }, async (payload) => {
                     const p = payload.new;
                     const oldEl = container.querySelector('[data-id="' + p.id + '"]');
                     if (oldEl) oldEl.remove();
                     const { data: member } = await sb.from('members').select('name, website').eq('id', p.member_id).single();
-                    renderObject({
+                    const objData = {
                         id: p.id,
                         member_id: p.member_id,
                         img: p.image_url,
@@ -670,20 +925,33 @@
                         x: p.canvas_x,
                         y: p.canvas_y,
                         rot: p.rotation
-                    }, 0, true);
+                    };
+                    renderObject(objData, 0, true);
+                    // Update mobile card
+                    const mGrid = document.getElementById('m-grid');
+                    if (mGrid) {
+                        const oldMCard = mGrid.querySelector('[data-id="' + p.id + '"]');
+                        if (oldMCard) oldMCard.replaceWith(createMobileCard(objData));
+                    }
                 })
                 .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'projects' }, (payload) => {
                     const id = payload.old.id;
                     const oldEl = container.querySelector('[data-id="' + id + '"]');
                     if (oldEl) oldEl.remove();
                     projectsData.delete(id);
+                    // Remove from mobile grid
+                    const mGrid = document.getElementById('m-grid');
+                    if (mGrid) {
+                        const mCard = mGrid.querySelector('[data-id="' + id + '"]');
+                        if (mCard) mCard.remove();
+                    }
                 })
                 .subscribe();
 
             sb.channel('members-realtime')
                 .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'members' }, async () => {
                     const { data: dbMembers } = await sb.from('members').select('name, website').order('name');
-                    if (dbMembers) renderMembers(dbMembers);
+                    if (dbMembers) { renderMembers(dbMembers); renderMobileMembers(dbMembers); }
                 })
                 .subscribe();
         }
@@ -695,19 +963,32 @@
                 const { data: { session } } = await sb.auth.getSession();
                 if (session) {
                     currentUserId = session.user.id;
-                    const overlay = document.querySelector('.ui-overlay');
 
+                    // Desktop nav
+                    const overlay = document.querySelector('.ui-overlay');
                     const submitBtn = document.createElement('a');
                     submitBtn.href = 'submit.html';
                     submitBtn.className = 'ui-btn';
                     submitBtn.innerHTML = '<svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Submit';
                     overlay.insertBefore(submitBtn, overlay.firstChild);
-
                     const profileBtn = document.createElement('a');
                     profileBtn.href = 'profile.html';
                     profileBtn.className = 'ui-btn';
                     profileBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Profile';
                     overlay.insertBefore(profileBtn, overlay.firstChild);
+
+                    // Mobile nav
+                    const mNav = document.getElementById('m-nav');
+                    if (mNav) {
+                        mNav.classList.remove('hidden');
+                        mNav.innerHTML = `
+                            <a href="submit.html"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Submit</a>
+                            <a href="profile.html"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Profile</a>
+                        `;
+                    }
+                    // Update mobile footer
+                    const mFooter = document.getElementById('m-footer-link');
+                    if (mFooter) mFooter.style.display = 'none';
                 }
             } catch(e) {}
         }
