@@ -389,20 +389,95 @@
             .explore-hint { display: none; }
         }
 
-        @media (max-width: 600px) {
-            /* Smaller center hub */
-            .center-logo { width: 100px; margin-bottom: 0.5rem; }
-            .center-hub { width: 280px; }
-            .members-label { font-size: 0.6rem; margin-bottom: 0.3rem; }
-            .member { font-size: 0.65rem; }
-            .member-sep { font-size: 0.65rem; margin: 0 4px; }
-            .mission-desc { font-size: 0.58rem; max-width: 240px; }
-            .mission-attribution { font-size: 0.85rem; }
+        /* Mobile top bar (hidden on desktop) */
+        .m-topbar { display: none; }
+        .m-info-overlay { display: none; }
 
-            /* Float objects: slightly smaller text on mobile */
+        @media (max-width: 600px) {
+            /* Hide center hub on canvas — moved to sticky top bar */
+            .center-hub { display: none !important; }
+
+            /* Float objects: slightly smaller text */
             .float-title { font-size: 0.9rem; }
             .float-desc { font-size: 0.5rem; }
             .float-creator { font-size: 0.5rem; }
+
+            /* Sticky top bar */
+            .m-topbar {
+                display: flex; align-items: center;
+                position: fixed; top: 0; left: 0; right: 0;
+                z-index: 300;
+                padding: 10px 12px;
+                background: rgba(245,240,235,0.85);
+                backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+                border-bottom: 1px solid rgba(0,0,0,0.04);
+                gap: 10px;
+            }
+            .m-topbar-logo {
+                width: 36px; height: auto; flex-shrink: 0;
+                filter: drop-shadow(0 2px 6px rgba(0,0,0,0.06));
+            }
+            .m-topbar-members {
+                display: flex; flex-wrap: wrap; align-items: center;
+                gap: 0; flex: 1; min-width: 0;
+                overflow: hidden;
+            }
+            .m-topbar-members .member { font-size: 0.62rem; white-space: nowrap; }
+            .m-topbar-members .member-sep { font-size: 0.62rem; margin: 0 4px; }
+            .m-topbar-info {
+                width: 28px; height: 28px; flex-shrink: 0;
+                display: flex; align-items: center; justify-content: center;
+                border-radius: 50%;
+                border: 1px solid rgba(0,0,0,0.08);
+                background: rgba(255,255,255,0.5);
+                font-family: var(--serif); font-style: italic;
+                font-size: 0.7rem; color: rgba(0,0,0,0.3);
+                cursor: pointer;
+                transition: all 0.2s ease;
+            }
+            .m-topbar-info:hover { background: rgba(255,255,255,0.9); color: rgba(0,0,0,0.5); }
+
+            /* Info overlay */
+            .m-info-overlay {
+                display: none;
+                position: fixed; inset: 0;
+                z-index: 400;
+                background: rgba(0,0,0,0.2);
+                backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+                align-items: center; justify-content: center;
+                padding: 2rem;
+            }
+            .m-info-overlay.open { display: flex; }
+            .m-info-card {
+                background: var(--bg);
+                border-radius: 18px;
+                padding: 2rem 1.5rem;
+                max-width: 320px; width: 100%;
+                text-align: center;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+                position: relative;
+            }
+            .m-info-close {
+                position: absolute; top: 12px; right: 12px;
+                width: 24px; height: 24px;
+                display: flex; align-items: center; justify-content: center;
+                border: none; background: transparent;
+                font-size: 1.1rem; color: rgba(0,0,0,0.25);
+                cursor: pointer; border-radius: 50%;
+                transition: all 0.2s ease;
+            }
+            .m-info-close:hover { color: rgba(0,0,0,0.5); background: rgba(0,0,0,0.04); }
+            .m-info-card .mission-desc {
+                font-family: var(--serif); font-style: italic;
+                font-size: 0.72rem; line-height: 1.6;
+                color: rgba(0,0,0,0.4); max-width: none;
+                margin-bottom: 0.5rem;
+            }
+            .m-info-card .mission-attribution {
+                font-family: var(--hand);
+                font-size: 1rem; color: rgba(0,0,0,0.25);
+                text-decoration: none;
+            }
 
             /* Controls at bottom center */
             .ui-overlay {
@@ -412,10 +487,10 @@
             }
             .ui-btn { padding: 8px 12px; font-size: 0.65rem; }
 
-            /* Hide sign-in dot on mobile */
+            /* Hide sign-in dot */
             .corner-secret { display: none; }
 
-            /* Hide explore hint after first interaction */
+            /* Explore hint */
             .explore-hint {
                 position: fixed; bottom: 4.5rem; left: 50%;
                 transform: translateX(-50%);
@@ -454,6 +529,22 @@
     </style>
 </head>
 <body>
+
+    <!-- Mobile sticky top bar -->
+    <div class="m-topbar" id="m-topbar">
+        <img src="logo.png" alt="Employment Club" class="m-topbar-logo">
+        <div class="m-topbar-members" id="m-topbar-members"></div>
+        <button class="m-topbar-info" id="m-info-btn" title="About">i</button>
+    </div>
+
+    <!-- Info overlay (mobile) -->
+    <div class="m-info-overlay" id="m-info-overlay">
+        <div class="m-info-card">
+            <button class="m-info-close" id="m-info-close">&times;</button>
+            <p class="mission-desc" style="margin-top: 0.5rem;">This club is a space for my friends to work on projects together and put their work out to help land a job. Everyone here is incredibly talented, a tinkerer at heart, and attends the ITP program at NYU.</p>
+            <a class="mission-attribution" href="https://surya.website" target="_blank">— Surya</a>
+        </div>
+    </div>
 
     <a href="submit.html" class="corner-secret" id="corner-secret" title="Sign in">&#9679;</a>
     <div class="ui-overlay">
@@ -502,6 +593,8 @@
         // Render members list
         function renderMembers(members) {
             membersList.innerHTML = '';
+            const mobileMembers = document.getElementById('m-topbar-members');
+            if (mobileMembers) mobileMembers.innerHTML = '';
             members.forEach((m, i) => {
                 const name = typeof m === 'string' ? m : m.name;
                 const website = typeof m === 'string' ? null : m.website;
@@ -524,6 +617,29 @@
                     sep.className = 'member-sep';
                     sep.textContent = '\u00b7';
                     membersList.appendChild(sep);
+                }
+                // Also populate mobile top bar
+                if (mobileMembers) {
+                    if (website) {
+                        const mel = document.createElement('a');
+                        mel.className = 'member';
+                        mel.href = safeUrl(website);
+                        mel.target = '_blank';
+                        mel.rel = 'noopener noreferrer';
+                        mel.textContent = name;
+                        mobileMembers.appendChild(mel);
+                    } else {
+                        const mel = document.createElement('span');
+                        mel.className = 'member';
+                        mel.textContent = name;
+                        mobileMembers.appendChild(mel);
+                    }
+                    if (i < members.length - 1) {
+                        const msep = document.createElement('span');
+                        msep.className = 'member-sep';
+                        msep.textContent = '\u00b7';
+                        mobileMembers.appendChild(msep);
+                    }
                 }
             });
         }
@@ -947,6 +1063,18 @@
         if (currentUserId) {
             const cs = document.getElementById('corner-secret');
             if (cs) cs.style.display = 'none';
+        }
+
+        // Mobile info overlay handlers
+        const mInfoBtn = document.getElementById('m-info-btn');
+        const mInfoOverlay = document.getElementById('m-info-overlay');
+        const mInfoClose = document.getElementById('m-info-close');
+        if (mInfoBtn && mInfoOverlay) {
+            mInfoBtn.addEventListener('click', () => mInfoOverlay.classList.add('open'));
+            mInfoClose.addEventListener('click', () => mInfoOverlay.classList.remove('open'));
+            mInfoOverlay.addEventListener('click', (e) => {
+                if (e.target === mInfoOverlay) mInfoOverlay.classList.remove('open');
+            });
         }
 
         // --- Pan & Zoom ---
