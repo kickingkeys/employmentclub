@@ -659,8 +659,8 @@
 
         // Render a single floating object on the canvas
         const isMobileCanvas = window.innerWidth <= 600;
-        const mobilePos = isMobileCanvas ? 0.5 : 1; // bring items closer on mobile
-        const itemSize = isMobileCanvas ? 180 : 132; // desktop 132, mobile stays 180
+        const mobilePos = isMobileCanvas ? 0.8 : 1; // spread items more on mobile to avoid overlap
+        const itemSize = isMobileCanvas ? 130 : 132; // smaller on mobile to fit
 
         function renderObject(obj, delay, skipAnim) {
             const el = document.createElement('div');
@@ -1089,7 +1089,7 @@
         const centerHub = document.getElementById('center-hub');
 
         const isMobile = window.innerWidth <= 600;
-        let state = { x: 0, y: 0, scale: isMobile ? 0.55 : 1 };
+        let state = { x: 0, y: 0, scale: isMobile ? 0.45 : 1 };
         let isDragging = false;
         let dragStartX, dragStartY;
         let zoomTimeout;
@@ -1109,7 +1109,7 @@
         centerBtn.addEventListener('click', () => {
             canvas.classList.remove('is-zooming');
             canvas.classList.add('is-animating');
-            state.x = 0; state.y = 0; state.scale = isMobile ? 0.55 : 1;
+            state.x = 0; state.y = 0; state.scale = isMobile ? 0.45 : 1;
             updateTransform();
             setTimeout(() => canvas.classList.remove('is-animating'), 550);
         });
