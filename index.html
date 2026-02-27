@@ -4,6 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Employment Club</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <meta name="description" content="a bunch of stupidly talented people who will definitely make your company money. hire them maybe?">
+    <meta property="og:title" content="Employment Club">
+    <meta property="og:description" content="a bunch of stupidly talented people who will definitely make your company money. hire them maybe?">
+    <meta property="og:image" content="https://kickingkeys.github.io/employmentclub/logo.png">
+    <meta property="og:url" content="https://kickingkeys.github.io/employmentclub">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Employment Club">
+    <meta name="twitter:description" content="a bunch of stupidly talented people who will definitely make your company money. hire them maybe?">
+    <meta name="twitter:image" content="https://kickingkeys.github.io/employmentclub/logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
@@ -394,6 +405,7 @@
         .edit-save:disabled { opacity: 0.4; cursor: not-allowed; }
 
         .hidden { display: none !important; }
+        .m-info-bottom { display: none; }
 
         /* --- Mobile --- */
         @media (min-width: 601px) {
@@ -418,35 +430,30 @@
             /* Mobile top bar — no fill, transparent */
             .m-topbar {
                 display: flex; align-items: center;
-                position: absolute; top: 10px; left: 12px; right: 12px;
+                position: absolute; top: 6px; left: 8px; right: 8px;
                 z-index: 300;
                 gap: 10px;
                 pointer-events: none;
             }
             .m-topbar > * { pointer-events: auto; }
             .m-topbar-logo {
-                width: 36px; height: auto; flex-shrink: 0;
-                filter: drop-shadow(0 2px 6px rgba(0,0,0,0.06));
+                width: clamp(40px, 12vw, 56px); height: auto; flex-shrink: 0;
             }
             .m-topbar-members {
-                display: flex; flex-wrap: wrap; align-items: center;
+                display: flex; flex-wrap: nowrap; align-items: center;
                 gap: 0; flex: 1; min-width: 0;
                 overflow: hidden;
             }
-            .m-topbar-members .member { font-size: 0.62rem; white-space: nowrap; }
-            .m-topbar-members .member-sep { font-size: 0.62rem; margin: 0 4px; }
-            .m-topbar-info {
-                width: 28px; height: 28px; flex-shrink: 0;
-                display: flex; align-items: center; justify-content: center;
-                border-radius: 50%;
-                border: 1px solid rgba(0,0,0,0.08);
-                background: rgba(255,255,255,0.5);
+            .m-topbar-members .member { font-size: clamp(0.6rem, 3vw, 0.82rem); white-space: nowrap; color: rgba(0,0,0,0.35); }
+            .m-topbar-members .member-sep { font-size: clamp(0.6rem, 3vw, 0.82rem); margin: 0 clamp(3px, 1.2vw, 7px); color: rgba(0,0,0,0.15); }
+            .m-info-bottom {
                 font-family: var(--serif); font-style: italic;
-                font-size: 0.7rem; color: rgba(0,0,0,0.3);
-                cursor: pointer;
-                transition: all 0.2s ease;
+                font-size: 0.65rem;
+                width: 30px; height: 30px;
+                border-radius: 50%;
+                padding: 0;
+                display: flex; align-items: center; justify-content: center;
             }
-            .m-topbar-info:hover { background: rgba(255,255,255,0.9); color: rgba(0,0,0,0.5); }
 
             /* Info overlay */
             .m-info-overlay {
@@ -497,6 +504,7 @@
                 padding: 0 0 max(1rem, env(safe-area-inset-bottom));
             }
             .ui-btn { padding: 8px 12px; font-size: 0.65rem; }
+            .m-info-bottom { display: flex; }
 
             /* Hide sign-in dot */
             .corner-secret { display: none; }
@@ -545,7 +553,6 @@
     <div class="m-topbar" id="m-topbar">
         <img src="logo.png" alt="Employment Club" class="m-topbar-logo">
         <div class="m-topbar-members" id="m-topbar-members"></div>
-        <button class="m-topbar-info" id="m-info-btn" title="About">i</button>
     </div>
 
     <!-- Info overlay (mobile) -->
@@ -559,6 +566,7 @@
 
     <a href="submit.html" class="corner-secret" id="corner-secret" title="Sign in">&#9679;</a>
     <div class="ui-overlay">
+        <button class="ui-btn m-info-bottom" id="m-info-btn" title="About">i</button>
         <div class="ui-btn" id="zoom-display">100%</div>
         <div class="ui-btn" id="center-btn" title="Back to center">
             <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>
