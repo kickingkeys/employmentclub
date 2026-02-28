@@ -407,6 +407,10 @@
 
         .hidden { display: none !important; }
         .m-info-bottom { display: none; }
+        .m-view-toggle { display: none; }
+        .m-card-counter { display: none; }
+        .mobile-card-view { display: none; }
+        .mobile-grid-view { display: none; }
 
         /* --- Mobile --- */
         @media (min-width: 601px) {
@@ -498,6 +502,17 @@
                 text-decoration: none;
             }
 
+            /* Hide canvas + explore hint on mobile */
+            .viewport { display: none !important; }
+            .explore-hint { display: none !important; }
+            .corner-secret { display: none; }
+
+            /* Hide desktop-only controls, show mobile ones */
+            #zoom-display { display: none !important; }
+            #center-btn { display: none !important; }
+            .m-info-bottom { display: flex; }
+            .m-view-toggle { display: flex !important; }
+
             /* Controls at bottom center */
             .ui-overlay {
                 bottom: 0; left: 0; right: 0;
@@ -505,29 +520,206 @@
                 padding: 0 0 max(1rem, env(safe-area-inset-bottom));
             }
             .ui-btn { padding: 8px 12px; font-size: 0.65rem; }
-            .m-info-bottom { display: flex; }
 
-            /* Hide sign-in dot */
-            .corner-secret { display: none; }
-
-            /* Explore hint */
-            .explore-hint {
-                position: fixed; bottom: 4.5rem; left: 50%;
-                transform: translateX(-50%);
-                display: flex; flex-direction: column; align-items: center; gap: 4px;
-                z-index: 100; pointer-events: none;
-                animation: hintPulse 2.5s ease-in-out infinite;
+            /* === CARD VIEW === */
+            .mobile-card-view {
+                position: fixed;
+                top: 0; left: 0; right: 0; bottom: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 56px 16px 72px 16px;
+                background: var(--bg);
+                z-index: 50;
+                overflow: hidden;
             }
-            .explore-hint span {
+            .mobile-card-view.hidden { display: none !important; }
+
+            .card-stack {
+                position: relative;
+                width: 100%;
+                max-width: 400px;
+                height: 100%;
+            }
+
+            .swipe-card {
+                position: absolute;
+                top: 0; left: 0; right: 0; bottom: 0;
+                background: var(--bg);
+                border-radius: 18px;
+                box-shadow: 0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);
+                overflow: hidden;
+                will-change: transform;
+                transition: transform 0.4s var(--ease-out), opacity 0.4s var(--ease-out);
+            }
+            .swipe-card.is-dragging { transition: none; }
+            .swipe-card.is-exiting {
+                transition: transform 0.35s var(--ease-out), opacity 0.35s ease;
+                opacity: 0;
+            }
+            .swipe-card.card-next {
+                transform: scale(0.95);
+                opacity: 0.5;
+                z-index: 0;
+            }
+            .swipe-card.card-current {
+                z-index: 1;
+                animation: cardEnter 0.3s var(--ease-out);
+            }
+
+            .card-image-wrap {
+                position: absolute;
+                top: 0; left: 0; right: 0; bottom: 0;
+                overflow: hidden;
+                border-radius: 18px;
+            }
+            .card-image {
+                width: 100%; height: 100%;
+                object-fit: cover;
+                display: block;
+                pointer-events: none;
+            }
+
+            .card-info {
+                position: absolute;
+                bottom: 0; left: 0; right: 0;
+                padding: 20px 18px 18px;
+                background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.5) 60%, transparent 100%);
+                backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+                border-radius: 0 0 18px 18px;
+            }
+            .card-creator-name {
+                font-family: var(--hand);
+                font-size: 0.95rem;
+                color: rgba(255,255,255,0.5);
+                margin-bottom: 1px;
+            }
+            .card-title {
+                font-family: var(--hand);
+                font-size: 1.5rem;
+                font-weight: 600;
+                color: rgba(255,255,255,0.95);
+                line-height: 1.15;
+                margin-bottom: 4px;
+            }
+            .card-desc {
                 font-family: var(--sans);
-                font-size: 0.6rem; font-weight: 600;
-                letter-spacing: 0.5px; text-transform: uppercase;
-                color: rgba(0,0,0,0.2);
+                font-size: 0.72rem;
+                color: rgba(255,255,255,0.55);
+                line-height: 1.5;
+                margin-bottom: 10px;
             }
-            .explore-hint svg {
-                width: 18px; height: 18px;
-                stroke: rgba(0,0,0,0.15); fill: none;
-                stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+            .card-link {
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+                font-family: var(--sans);
+                font-size: 0.65rem;
+                font-weight: 600;
+                letter-spacing: 0.3px;
+                text-transform: uppercase;
+                color: #fff;
+                text-decoration: none;
+                background: rgba(255,255,255,0.15);
+                backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+                padding: 8px 16px;
+                border-radius: 20px;
+                transition: background 0.2s ease;
+            }
+            .card-link:active { background: rgba(255,255,255,0.25); }
+            .card-link svg {
+                width: 10px; height: 10px;
+                stroke: currentColor; fill: none;
+                stroke-width: 2.5;
+            }
+
+            .card-empty {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 100%;
+                font-family: var(--hand);
+                font-size: 1.2rem;
+                color: rgba(0,0,0,0.2);
+                text-align: center;
+                padding: 2rem;
+            }
+
+            /* Card counter */
+            .m-card-counter {
+                display: flex !important;
+                font-family: var(--hand);
+                font-size: 0.85rem;
+                color: rgba(0,0,0,0.3);
+                font-variant-numeric: tabular-nums;
+            }
+
+            /* === GRID VIEW === */
+            .mobile-grid-view {
+                position: fixed;
+                top: 0; left: 0; right: 0; bottom: 0;
+                display: block;
+                padding: 56px 10px 72px 10px;
+                background: var(--bg);
+                z-index: 50;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            .mobile-grid-view.hidden { display: none !important; }
+
+            .grid-container {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+
+            .grid-tile {
+                position: relative;
+                border-radius: 12px;
+                overflow: hidden;
+                aspect-ratio: 3 / 4;
+                background: rgba(255,255,255,0.4);
+                box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+                cursor: pointer;
+                transition: transform 0.2s var(--ease-out);
+                animation: gridTileEnter 0.4s var(--ease-out) forwards;
+                animation-delay: calc(var(--tile-i) * 0.04s);
+                opacity: 0;
+            }
+            .grid-tile:active { transform: scale(0.97); }
+
+            .grid-tile-img {
+                width: 100%; height: 100%;
+                object-fit: cover;
+                display: block;
+            }
+
+            .grid-tile-overlay {
+                position: absolute;
+                bottom: 0; left: 0; right: 0;
+                padding: 16px 10px 10px;
+                background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.4) 40%, rgba(0,0,0,0.05) 80%, transparent 100%);
+            }
+            .grid-tile-title {
+                font-family: var(--hand);
+                font-size: 1rem;
+                font-weight: 600;
+                color: #fff;
+                line-height: 1.15;
+            }
+            .grid-tile-creator {
+                font-family: var(--sans);
+                font-size: 0.5rem;
+                font-weight: 500;
+                color: rgba(255,255,255,0.65);
+                margin-top: 2px;
+            }
+
+            /* Toggle icon */
+            .m-view-toggle svg {
+                width: 14px; height: 14px;
+                stroke: currentColor; fill: none;
+                stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
             }
         }
 
@@ -546,6 +738,16 @@
             0% { opacity: 0; transform: translate(var(--tx), var(--ty)) rotate(var(--rot)) scale(0.85); }
             100% { opacity: 1; transform: translate(var(--tx), var(--ty)) rotate(var(--rot)) scale(1); }
         }
+
+        @keyframes cardEnter {
+            from { opacity: 0; transform: scale(0.93); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes gridTileEnter {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
     </style>
 </head>
 <body>
@@ -560,14 +762,30 @@
     <div class="m-info-overlay" id="m-info-overlay">
         <div class="m-info-card">
             <button class="m-info-close" id="m-info-close">&times;</button>
-            <p class="mission-desc" style="margin-top: 0.5rem;">This club is a space for my friends to work on projects together and put their work out to help land a job. Everyone here is incredibly talented, a tinkerer at heart, and attends the ITP program at NYU.</p>
-            <a class="mission-attribution" href="https://surya.website" target="_blank">— Surya</a>
+            <img src="logo.png" alt="Employment Club" style="width: 64px; height: auto; margin-bottom: 0.8rem;">
+            <p class="mission-desc" style="margin-top: 0;">This club is a space for my friends to work on projects together and put their work out to help land a job. Everyone here is incredibly talented, a tinkerer at heart, and attends the ITP program at NYU.</p>
+            <a class="mission-attribution" href="https://surya.website" target="_blank" style="text-decoration: underline; text-underline-offset: 3px;">— Surya <svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle;"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></a>
         </div>
+    </div>
+
+    <!-- Mobile Card View -->
+    <div class="mobile-card-view hidden" id="mobile-card-view">
+        <div class="card-stack" id="card-stack"></div>
+    </div>
+
+    <!-- Mobile Grid View -->
+    <div class="mobile-grid-view hidden" id="mobile-grid-view">
+        <div class="grid-container" id="grid-container"></div>
     </div>
 
     <a href="submit.html" class="corner-secret" id="corner-secret" title="Sign in">&#9679;</a>
     <div class="ui-overlay">
         <button class="ui-btn m-info-bottom" id="m-info-btn" title="About">i</button>
+        <button class="ui-btn m-view-toggle" id="m-view-toggle" title="Switch view">
+            <svg viewBox="0 0 24 24" id="toggle-icon-grid"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+            <svg viewBox="0 0 24 24" id="toggle-icon-cards" style="display:none"><rect x="4" y="4" width="16" height="16" rx="3"/></svg>
+        </button>
+        <div class="ui-btn m-card-counter" id="m-card-counter">1 / 1</div>
         <div class="ui-btn" id="zoom-display">100%</div>
         <div class="ui-btn" id="center-btn" title="Back to center">
             <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>
@@ -609,6 +827,22 @@
         let currentUserId = null;
         const projectsData = new Map();
         let editImageFile = null;
+
+        // Mobile view state
+        const isMobile = window.innerWidth <= 600;
+        let mobileViewMode = 'card';
+        let mobileProjects = [];
+        let currentCardIndex = 0;
+        let cardSwipeState = { startX: 0, startY: 0, deltaX: 0, isDragging: false, startTime: 0 };
+
+        function shuffleArray(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
 
         // Render members list
         function renderMembers(members) {
@@ -745,6 +979,183 @@
             return el;
         }
 
+        // === Mobile Card View ===
+        function renderMobileCard(project) {
+            const card = document.createElement('div');
+            card.className = 'swipe-card';
+            card.dataset.id = project.id;
+            const imgSrc = esc(project.img || '');
+            const title = esc(project.title || '');
+            const desc = esc(project.desc || '');
+            const creator = esc((project.creator || '').split(' ')[0]);
+            const url = safeUrl(project.url || '');
+            const linkHtml = url
+                ? `<a class="card-link" href="${url}" target="_blank" rel="noopener noreferrer">View project <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></a>`
+                : '';
+            card.innerHTML = `
+                <div class="card-image-wrap"><img class="card-image" src="${imgSrc}" alt="${title}"></div>
+                <div class="card-info">
+                    <div class="card-creator-name">${creator}</div>
+                    <div class="card-title">${title}</div>
+                    <div class="card-desc">${desc}</div>
+                    ${linkHtml}
+                </div>`;
+            return card;
+        }
+
+        function showCardAtIndex(index) {
+            const stack = document.getElementById('card-stack');
+            if (!stack) return;
+            if (mobileProjects.length === 0) {
+                stack.innerHTML = '<div class="card-empty">No projects yet — check back soon!</div>';
+                return;
+            }
+            currentCardIndex = Math.max(0, Math.min(index, mobileProjects.length - 1));
+            stack.innerHTML = '';
+            if (currentCardIndex < mobileProjects.length - 1) {
+                const next = renderMobileCard(mobileProjects[currentCardIndex + 1]);
+                next.classList.add('card-next');
+                stack.appendChild(next);
+            }
+            const current = renderMobileCard(mobileProjects[currentCardIndex]);
+            current.classList.add('card-current');
+            stack.appendChild(current);
+            attachSwipeListeners(current);
+            updateCardCounter();
+            highlightTopBarMember();
+        }
+
+        function highlightTopBarMember() {
+            const members = document.getElementById('m-topbar-members');
+            if (!members || mobileProjects.length === 0) return;
+            const creator = (mobileProjects[currentCardIndex].creator || '').split(' ')[0].toLowerCase();
+            members.querySelectorAll('.member').forEach(el => {
+                if (el.textContent.toLowerCase() === creator) {
+                    el.style.color = 'var(--text)';
+                    el.style.fontWeight = '600';
+                } else {
+                    el.style.color = '';
+                    el.style.fontWeight = '';
+                }
+            });
+        }
+
+        function updateCardCounter() {
+            const c = document.getElementById('m-card-counter');
+            if (c) c.textContent = (currentCardIndex + 1) + ' / ' + mobileProjects.length;
+        }
+
+        function attachSwipeListeners(card) {
+            card.addEventListener('touchstart', onCardTouchStart, { passive: true });
+            card.addEventListener('touchmove', onCardTouchMove, { passive: false });
+            card.addEventListener('touchend', onCardTouchEnd, { passive: true });
+        }
+
+        function onCardTouchStart(e) {
+            if (e.touches.length !== 1) return;
+            cardSwipeState.startX = e.touches[0].clientX;
+            cardSwipeState.startY = e.touches[0].clientY;
+            cardSwipeState.deltaX = 0;
+            cardSwipeState.isDragging = false;
+            cardSwipeState.startTime = Date.now();
+            this.classList.add('is-dragging');
+        }
+
+        function onCardTouchMove(e) {
+            if (e.touches.length !== 1) return;
+            const dx = e.touches[0].clientX - cardSwipeState.startX;
+            const dy = e.touches[0].clientY - cardSwipeState.startY;
+            if (!cardSwipeState.isDragging && Math.abs(dy) > Math.abs(dx)) return;
+            cardSwipeState.isDragging = true;
+            cardSwipeState.deltaX = dx;
+            e.preventDefault();
+            const rot = Math.max(-10, Math.min(10, dx * 0.04));
+            this.style.transform = 'translateX(' + dx + 'px) rotate(' + rot + 'deg)';
+            const progress = Math.min(Math.abs(dx) / 200, 1);
+            const next = this.parentElement.querySelector('.card-next');
+            if (next) {
+                next.style.transform = 'scale(' + (0.95 + progress * 0.05) + ')';
+                next.style.opacity = 0.5 + progress * 0.5;
+                next.style.transition = 'none';
+            }
+        }
+
+        function onCardTouchEnd() {
+            this.classList.remove('is-dragging');
+            const dx = cardSwipeState.deltaX;
+            const elapsed = Date.now() - cardSwipeState.startTime;
+            const velocity = Math.abs(dx) / elapsed;
+            const threshold = window.innerWidth * 0.25;
+            const swipedLeft = (dx < -threshold || (dx < -40 && velocity > 0.5)) && currentCardIndex < mobileProjects.length - 1;
+            const swipedRight = (dx > threshold || (dx > 40 && velocity > 0.5)) && currentCardIndex > 0;
+            if (swipedLeft) {
+                this.classList.add('is-exiting');
+                this.style.transform = 'translateX(' + (-window.innerWidth * 1.2) + 'px) rotate(-15deg)';
+                setTimeout(() => showCardAtIndex(currentCardIndex + 1), 280);
+            } else if (swipedRight) {
+                this.classList.add('is-exiting');
+                this.style.transform = 'translateX(' + (window.innerWidth * 1.2) + 'px) rotate(15deg)';
+                setTimeout(() => showCardAtIndex(currentCardIndex - 1), 280);
+            } else {
+                this.style.transform = '';
+                const next = this.parentElement.querySelector('.card-next');
+                if (next) { next.style.transform = ''; next.style.opacity = ''; next.style.transition = ''; }
+            }
+            cardSwipeState.isDragging = false;
+        }
+
+        // === Mobile Grid View ===
+        function renderMobileGrid() {
+            const gc = document.getElementById('grid-container');
+            if (!gc) return;
+            gc.innerHTML = '';
+            mobileProjects.forEach((project, i) => {
+                const tile = document.createElement('div');
+                tile.className = 'grid-tile';
+                tile.dataset.index = i;
+                tile.style.setProperty('--tile-i', i);
+                const imgSrc = esc(project.img || '');
+                const title = esc(project.title || '');
+                const creator = esc((project.creator || '').split(' ')[0]);
+                tile.innerHTML = `
+                    <img class="grid-tile-img" src="${imgSrc}" alt="${title}" loading="lazy">
+                    <div class="grid-tile-overlay">
+                        <div class="grid-tile-title">${title}</div>
+                        <div class="grid-tile-creator">${creator}</div>
+                    </div>`;
+                tile.addEventListener('click', () => {
+                    currentCardIndex = i;
+                    switchMobileView('card');
+                });
+                gc.appendChild(tile);
+            });
+        }
+
+        // === Mobile View Toggle ===
+        function switchMobileView(mode) {
+            mobileViewMode = mode;
+            const cardView = document.getElementById('mobile-card-view');
+            const gridView = document.getElementById('mobile-grid-view');
+            const counter = document.getElementById('m-card-counter');
+            const gridIcon = document.getElementById('toggle-icon-grid');
+            const cardIcon = document.getElementById('toggle-icon-cards');
+            if (mode === 'card') {
+                cardView.classList.remove('hidden');
+                gridView.classList.add('hidden');
+                if (counter) counter.style.display = '';
+                if (gridIcon) gridIcon.style.display = '';
+                if (cardIcon) cardIcon.style.display = 'none';
+                showCardAtIndex(currentCardIndex);
+            } else {
+                cardView.classList.add('hidden');
+                gridView.classList.remove('hidden');
+                if (counter) counter.style.display = 'none';
+                if (gridIcon) gridIcon.style.display = 'none';
+                if (cardIcon) cardIcon.style.display = '';
+                renderMobileGrid();
+            }
+        }
+
         // Load data from Supabase
         async function loadData() {
             if (!sb) return;
@@ -763,22 +1174,30 @@
                     .order('created_at');
 
                 if (dbProjects && dbProjects.length > 0) {
-                    dbProjects.forEach((p, i) => {
-                        renderObject({
-                            id: p.id,
-                            member_id: p.member_id,
-                            img: p.image_url,
-                            title: p.title,
-                            desc: p.description,
-                            url: p.project_url,
-                            creator: p.members?.name || '',
-                            creator_website: p.members?.website || '',
-                            w: p.width,
-                            x: p.canvas_x,
-                            y: p.canvas_y,
-                            rot: p.rotation
-                        }, 0.3 + i * 0.06);
-                    });
+                    const projectObjects = dbProjects.map(p => ({
+                        id: p.id,
+                        member_id: p.member_id,
+                        img: p.image_url,
+                        title: p.title,
+                        desc: p.description,
+                        url: p.project_url,
+                        creator: p.members?.name || '',
+                        creator_website: p.members?.website || '',
+                        w: p.width,
+                        x: p.canvas_x,
+                        y: p.canvas_y,
+                        rot: p.rotation
+                    }));
+                    projectObjects.forEach(obj => projectsData.set(obj.id, obj));
+
+                    if (isMobile) {
+                        mobileProjects = shuffleArray(projectObjects);
+                        switchMobileView('card');
+                    } else {
+                        projectObjects.forEach((obj, i) => {
+                            renderObject(obj, 0.3 + i * 0.06);
+                        });
+                    }
                 }
             } catch(e) {
                 console.log('Supabase fetch failed', e);
@@ -803,7 +1222,13 @@
                         y: p.canvas_y,
                         rot: p.rotation
                     };
-                    renderObject(objData, 0);
+                    if (isMobile) {
+                        mobileProjects.splice(Math.floor(Math.random() * (mobileProjects.length + 1)), 0, objData);
+                        if (mobileViewMode === 'grid') renderMobileGrid();
+                        updateCardCounter();
+                    } else {
+                        renderObject(objData, 0);
+                    }
                 })
                 .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'projects' }, async (payload) => {
                     const p = payload.new;
@@ -824,13 +1249,26 @@
                         y: p.canvas_y,
                         rot: p.rotation
                     };
-                    renderObject(objData, 0, true);
+                    if (isMobile) {
+                        const mIdx = mobileProjects.findIndex(p => p.id === objData.id);
+                        if (mIdx !== -1) mobileProjects[mIdx] = objData;
+                        if (mobileViewMode === 'card') showCardAtIndex(currentCardIndex);
+                        else renderMobileGrid();
+                    } else {
+                        renderObject(objData, 0, true);
+                    }
                 })
                 .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'projects' }, (payload) => {
                     const id = payload.old.id;
                     const oldEl = container.querySelector('[data-id="' + id + '"]');
                     if (oldEl) oldEl.remove();
                     projectsData.delete(id);
+                    if (isMobile) {
+                        mobileProjects = mobileProjects.filter(p => p.id !== id);
+                        if (currentCardIndex >= mobileProjects.length) currentCardIndex = Math.max(0, mobileProjects.length - 1);
+                        if (mobileViewMode === 'card') showCardAtIndex(currentCardIndex);
+                        else renderMobileGrid();
+                    }
                 })
                 .subscribe();
 
@@ -1090,6 +1528,14 @@
             });
         }
 
+        // Mobile view toggle
+        const mViewToggle = document.getElementById('m-view-toggle');
+        if (mViewToggle && isMobile) {
+            mViewToggle.addEventListener('click', () => {
+                switchMobileView(mobileViewMode === 'card' ? 'grid' : 'card');
+            });
+        }
+
         // --- Pan & Zoom ---
         const viewport = document.getElementById('viewport');
         const canvas = document.getElementById('canvas');
@@ -1097,7 +1543,6 @@
         const centerBtn = document.getElementById('center-btn');
         const centerHub = document.getElementById('center-hub');
 
-        const isMobile = window.innerWidth <= 600;
         let state = { x: 0, y: 0, scale: isMobile ? 0.45 : 1 };
         let isDragging = false;
         let dragStartX, dragStartY;
@@ -1214,7 +1659,7 @@
             }
         });
 
-        updateTransform();
+        if (!isMobile) updateTransform();
     </script>
 </body>
 </html>
