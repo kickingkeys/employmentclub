@@ -554,7 +554,7 @@
             }
             .swipe-card.is-dragging { transition: none; }
             .swipe-card.is-snapping {
-                transition: transform 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                transition: transform 0.3s ease-out;
             }
             .swipe-card.is-exiting {
                 transition: transform 0.45s var(--ease-out), opacity 0.45s ease;
@@ -1089,8 +1089,8 @@
             const dy = e.touches[0].clientY - cardSwipeState.startY;
             // Dead zone — ignore tiny movements
             if (!cardSwipeState.isDragging) {
-                if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
-                if (Math.abs(dy) > Math.abs(dx) * 1.2) return; // vertical scroll wins
+                if (Math.abs(dx) < 5 && Math.abs(dy) < 5) return;
+                if (Math.abs(dy) > Math.abs(dx) * 1.5) return; // only block clearly vertical
             }
             cardSwipeState.isDragging = true;
             cardSwipeState.deltaX = dx;
@@ -1119,9 +1119,9 @@
             const elapsed = Date.now() - cardSwipeState.startTime;
             const velocity = Math.abs(dx) / Math.max(elapsed, 1);
             const w = window.innerWidth;
-            const threshold = w * 0.3;
-            const minFlickDist = 60;
-            const flickVelocity = 0.65;
+            const threshold = w * 0.2;
+            const minFlickDist = 30;
+            const flickVelocity = 0.4;
 
             const swipedLeft = (dx < -threshold || (dx < -minFlickDist && velocity > flickVelocity)) && currentCardIndex < mobileProjects.length - 1;
             const swipedRight = (dx > threshold || (dx > minFlickDist && velocity > flickVelocity)) && currentCardIndex > 0;
