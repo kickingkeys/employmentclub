@@ -1019,7 +1019,7 @@
             return card;
         }
 
-        function showCardAtIndex(index) {
+        function showCardAtIndex(index, fromSwipe) {
             const stack = document.getElementById('card-stack');
             if (!stack) return;
             if (mobileProjects.length === 0) {
@@ -1041,6 +1041,7 @@
             // Current card on top
             const current = renderMobileCard(mobileProjects[currentCardIndex]);
             current.classList.add('card-current');
+            if (fromSwipe) current.style.animation = 'none';
             stack.appendChild(current);
             attachSwipeListeners(current);
             updateCardCounter();
@@ -1138,7 +1139,7 @@
                     behind1.style.opacity = '1';
                 }
                 const nextIndex = swipedLeft ? currentCardIndex + 1 : currentCardIndex - 1;
-                setTimeout(() => showCardAtIndex(nextIndex), 350);
+                setTimeout(() => showCardAtIndex(nextIndex, true), 350);
             } else {
                 // Snap back with spring
                 this.classList.add('is-snapping');
